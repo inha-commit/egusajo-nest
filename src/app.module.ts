@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from './config/validationSchema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeormConfigService } from './config/typeorm.config.service';
 
 @Module({
   imports: [
@@ -12,6 +14,10 @@ import { validationSchema } from './config/validationSchema';
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
       validationSchema,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: TypeormConfigService,
     }),
   ],
   controllers: [AppController],
