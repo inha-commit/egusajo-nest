@@ -9,8 +9,8 @@
     "build": "nest build",
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:prod": "NODE_ENV=production node dist/main",
-    "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs}/**/*.ts\" \"{src,apps,libs}/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"src/*.ts\"",
     "db:create:dev": "NODE_ENV=development ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:create -d ./dataSource.ts",
     "db:drop:dev": "NODE_ENV=development ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:drop -d ./dataSource.ts",
     "schema:drop:dev": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js schema:drop -d ./dataSource.ts",
@@ -33,10 +33,12 @@
     "@nestjs/typeorm": "^10.0.0",
     "joi": "^17.11.0",
     "mysql2": "^3.6.1",
+    "nest-winston": "^1.9.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.17",
-    "typeorm-extension": "^3.0.2"
+    "typeorm-extension": "^3.0.2",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
