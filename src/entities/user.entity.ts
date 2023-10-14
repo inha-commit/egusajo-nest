@@ -29,8 +29,8 @@ export class UserEntity {
   nickname: string;
 
   // 유저 생일
-  @Column('date')
-  birthday: Date;
+  @Column('varchar', { length: 5 })
+  birthday: string;
 
   @CreateDateColumn()
   createdAt: Date;
