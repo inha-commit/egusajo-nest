@@ -16,7 +16,7 @@ export class PresentImageEntity {
   id: number;
 
   // 이미지 저장소 주소
-  @Column({ type: 'string' })
+  @Column('varchar')
   src: string;
 
   @CreateDateColumn()
