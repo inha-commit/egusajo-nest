@@ -46,7 +46,7 @@ jobs:
             REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }}
 
   code-deploy:
-    needs: build-and-push-image-to-dockerHub
+    needs: build-and-push-image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
