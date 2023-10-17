@@ -45,23 +45,23 @@ jobs:
             ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }}
             REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }}
 
-#  code-deploy:
-#    needs: build-and-push-image-to-dockerHub
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#
-#      - name: Access to server and Run container
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.SERVER_IP }}
-#          username: ${{ secrets.SERVER_USER }}
-#          password: ${{ secrets.SSH_PASSWORD }}
-#          script: |
-#            cd egusajo
-#            docker-compose down
-#            docker-compose rm
-#            docker rmi ${{ secrets.IMAGE_NANE }}
-#            docker pull ${{ secrets.IMAGE_NANE }}
-#            docker-compose up -d
+  code-deploy:
+    needs: build-and-push-image-to-dockerHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Access to server and Run container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd egusajo
+            docker-compose down
+            docker-compose rm
+            docker rmi ${{ secrets.IMAGE_NANE }}
+            docker pull ${{ secrets.IMAGE_NANE }}
+            docker-compose up -d
