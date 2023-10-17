@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { DataSource, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Tokens } from '../type/type';
+import { NicknameValidationResponse, Tokens } from '../type/type';
 import { UserEntity } from '../entities/user.entity';
 import { UserImageEntity } from '../entities/userImage.entity';
 
@@ -33,6 +33,13 @@ export class UsersService {
     return this.createToken(user.id);
   }
 
+  /**
+   * 회원가입
+   * @param snsId
+   * @param nickname
+   * @param birthday
+   * @param profileImageSrc
+   */
   async signUp(
     snsId: string,
     nickname: string,
@@ -94,12 +101,14 @@ export class UsersService {
    * 닉네임 중복 체크
    * @param nickname
    */
-  async validateNickname(nickname: string): Promise<boolean> {
+  async validateNickname(
+    nickname: string,
+  ): Promise<NicknameValidationResponse> {
     const user = await this.userRepository.findOne({
       where: { nickname: nickname },
     });
 
-    return !!user;
+    return { exist: !!user };
   }
 
   /**
