@@ -4,11 +4,21 @@ import { WinstonModule } from 'nest-winston';
 import { Request, Response, NextFunction } from 'express';
 import { winstonConfig } from './config/winston.config';
 import { Logger } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Sleact API')
+    .setDescription('Sleact 개발을 위한 API 문서입니다.')
+    .setVersion('1.0')
+    .addCookieAuth('connect.sid')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();

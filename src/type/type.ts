@@ -3,4 +3,8 @@ type Tokens = {
   refreshToken: string;
 };
 
-export type { Tokens };
+type NicknameValidationResponse = {
+  exist: boolean;
+};
+
+export type { Tokens, NicknameValidationResponse };
