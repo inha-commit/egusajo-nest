@@ -39,12 +39,14 @@ export class UsersService {
    * @param snsId
    * @param nickname
    * @param birthday
+   * @param fcmId
    * @param profileImageSrc
    */
   async signUp(
     snsId: string,
     nickname: string,
     birthday: string,
+    fcmId: string,
     profileImageSrc: string | null,
   ): Promise<Tokens> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -75,7 +77,9 @@ export class UsersService {
       const newUser = new UserEntity();
       newUser.snsId = snsId;
       newUser.nickname = nickname;
+      newUser.fcmId = fcmId;
       newUser.birthday = birthday;
+      newUser.alarm = true;
 
       // 유저 이미지 저장
       const userImage = new UserImageEntity();

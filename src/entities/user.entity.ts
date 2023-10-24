@@ -21,6 +21,7 @@ export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
+  // 유저 카카오 고유 id
   @Column('varchar', { unique: true })
   snsId: string;
 
@@ -29,8 +30,16 @@ export class UserEntity {
   nickname: string;
 
   // 유저 생일
-  @Column('varchar', { length: 5 })
+  @Column('varchar', { length: 8 })
   birthday: string;
+
+  // fcm 알림 받을 고유 id
+  @Column('varchar', { unique: true })
+  fcmId: string;
+
+  // 알람 수신 여부
+  @Column('boolean', { default: true })
+  alarm: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
