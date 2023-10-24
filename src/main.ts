@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { WinstonModule } from 'nest-winston';
 import { Request, Response, NextFunction } from 'express';
 import { winstonConfig } from './config/winston.config';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -20,6 +20,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  // api소요시간, 보낸사람 ip 확인하는 middleware
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
 
@@ -36,6 +37,10 @@ async function bootstrap() {
     });
     next();
   });
+
+  // class-validator 글로벌 파이프라인 추가
+  app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(3000);
 }
 bootstrap();
