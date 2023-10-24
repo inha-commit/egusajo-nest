@@ -17,12 +17,18 @@ export class SignupRequestDto {
 
   @ApiProperty({
     description:
-      '생일 (MM-DD 형식으로 보내주세요) 때문에 항상 5글자여야합니다.',
+      '생일 (YYYYMMDD 형식으로 보내주세요) 때문에 항상 5글자여야합니다.',
   })
   @IsString()
-  @MinLength(5)
-  @MaxLength(5)
+  @MinLength(8)
+  @MaxLength(8)
   readonly birthday: string;
+
+  @ApiProperty({
+    description: 'fcm 고유 아이디',
+  })
+  @IsString()
+  readonly fcmId: string;
 
   @ApiProperty({
     description:

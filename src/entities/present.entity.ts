@@ -27,6 +27,10 @@ export class PresentEntity {
   @Column('varchar')
   productLink: string;
 
+  // 펀딩 완료 여부
+  @Column('boolean')
+  complete: boolean;
+
   // 펀딩 최종 금액
   @Column('int')
   goal: number;

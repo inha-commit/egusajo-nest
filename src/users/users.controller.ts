@@ -41,6 +41,7 @@ export class UsersController {
       data.snsId,
       data.nickname,
       data.birthday,
+      data.fcmId,
       data.profileImageSrc,
     );
 
