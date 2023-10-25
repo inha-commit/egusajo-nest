@@ -12,7 +12,6 @@ import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 
 import { CustomErrorFilter } from './type/custom.error.filter';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
