@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import customErrorCode from './custom.error.code';
-import { ValidationError } from 'class-validator';
 
 @Catch(HttpException)
 export class CustomErrorFilter implements ExceptionFilter {

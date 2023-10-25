@@ -1,10 +1,10 @@
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UserEntity } from '../entities/user.entity';
 import { UserImageEntity } from '../entities/userImage.entity';
+import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -19,7 +19,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [UsersController],
-  exports: [UsersService],
   providers: [UsersService, Logger],
 })
 export class UsersModule {}
