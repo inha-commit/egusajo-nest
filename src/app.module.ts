@@ -1,6 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
