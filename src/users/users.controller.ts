@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { SignupRequestDto } from './dto/signup.request.dto';
@@ -57,6 +57,19 @@ export class UsersController {
   })
   @Post('nickname-validation')
   async validateNickname(@Body() data: NicknameValidationRequestDto) {
+    const response = await this.usersService.validateNickname(data.nickname);
+
+    return new NicknameValidationResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '내 정보 가져오기',
+  })
+  @ApiOkResponse({
+    type: NicknameValidationResponseDto,
+  })
+  @Get('/me')
+  async getMyInfo(@Body() data: NicknameValidationRequestDto) {
     const response = await this.usersService.validateNickname(data.nickname);
 
     return new NicknameValidationResponseDto(response);

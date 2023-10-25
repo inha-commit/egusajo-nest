@@ -1,12 +1,16 @@
 import { Logger, Module } from '@nestjs/common';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+
 import { validationSchema } from './config/validationSchema';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeormConfigService } from './config/typeorm.config.service';
-import { APP_FILTER } from '@nestjs/core';
+
 import { CustomErrorFilter } from './type/custom.error.filter';
 
 @Module({
@@ -20,6 +24,13 @@ import { CustomErrorFilter } from './type/custom.error.filter';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeormConfigService,
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
