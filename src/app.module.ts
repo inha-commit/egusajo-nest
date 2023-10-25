@@ -12,9 +12,12 @@ import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 
 import { CustomErrorFilter } from './type/custom.error.filter';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     UsersModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class LoginResponseDto {
+class SigninResponseDto {
   @ApiProperty({
     name: 'accessToken',
     description: 'accessToken, 시간 10분',
@@ -13,10 +13,10 @@ class LoginResponseDto {
   })
   public refreshToken: string;
 
-  constructor(obj: LoginResponseDto) {
+  constructor(obj: SigninResponseDto) {
     this.accessToken = obj.accessToken;
     this.refreshToken = obj.refreshToken;
   }
 }
 
-export { LoginResponseDto };
+export { SigninResponseDto };

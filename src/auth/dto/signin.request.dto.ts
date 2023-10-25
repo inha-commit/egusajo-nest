@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class LoginRequestDto {
+export class SigninRequestDto {
   @ApiProperty({
     description: '카카오 snsId',
   })
