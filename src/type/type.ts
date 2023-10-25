@@ -1,10 +1,14 @@
+type AccessToken = {
+  accessToken: string;
+};
+
 type Tokens = {
   accessToken: string;
   refreshToken: string;
 };
 
 type NicknameValidationResponse = {
-  exist: boolean;
+  success: boolean;
 };
 
-export type { Tokens, NicknameValidationResponse };
+export type { AccessToken, Tokens, NicknameValidationResponse };

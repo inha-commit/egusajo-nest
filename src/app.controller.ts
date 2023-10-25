@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  Inject,
-  Logger,
-  LoggerService,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Inject, Logger, LoggerService } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AccessTokenGuard } from './guard/access.token.guard';
 
 @Controller()
 export class AppController {
@@ -18,7 +10,6 @@ export class AppController {
   ) {}
 
   @Get()
-  @UseGuards(AccessTokenGuard)
   getHello(): string {
     return this.appService.getHello();
   }

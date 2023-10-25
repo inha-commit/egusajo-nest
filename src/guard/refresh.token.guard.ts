@@ -17,7 +17,7 @@ export class RefreshTokenGuard implements CanActivate {
 
     if (!token) {
       throw new BadRequestException({
-        message: 'No refreshToken in header',
+        message: '헤더에 refresh_token이 존재하지 않습니다!',
         code: customErrorCode.NO_REFRESH_TOKEN,
       });
     }
@@ -29,7 +29,7 @@ export class RefreshTokenGuard implements CanActivate {
 
       if (!decoded.userId) {
         throw new BadRequestException({
-          message: 'Invalid refreshToken',
+          message: '잘못된 refresh_token 입니다!',
           code: customErrorCode.INVALID_REFRESH_TOKEN,
         });
       }
@@ -39,12 +39,12 @@ export class RefreshTokenGuard implements CanActivate {
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new BadRequestException({
-          message: 'Expired refreshToken',
+          message: '만료된 refresh_token 입니다!',
           code: customErrorCode.EXPIRED_REFRESH_TOKEN,
         });
       } else {
         throw new BadRequestException({
-          message: 'Invalid refreshToken',
+          message: '잘못된 refresh_token 입니다!',
           code: customErrorCode.INVALID_ACCESS_TOKEN,
         });
       }

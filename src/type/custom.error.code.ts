@@ -1,6 +1,10 @@
 enum CustomErrorCode {
   // 인증 관련 에러 코드
-  INVALID_LOGIN = 1000, // 잘못된 로그인 방식 -> 소셜 아이디로 로컬로그인 하는경우
+  INVALID_LOGIN = 1000,
+  USER_ALREADY_EXIST = 1001,
+  USER_NOT_FOUND = 1002,
+  INVALID_NICKNAME = 1100, // 닉네임에 욕설 및 비속어 포함
+  DUPLICATE_NICKNAME = 1101, // 이미 존재하는 닉네임
 
   // 토큰 관련 코드
   NO_ACCESS_TOKEN = 2000,
@@ -12,7 +16,7 @@ enum CustomErrorCode {
   INVALID_REFRESH_TOKEN = 2102,
 
   // 유저 관련 에러 코드
-  USER_NOT_FOUND = 3000,
+  USER = 3000,
 
   // 선물 관련 에러 코드
   PRESENT_NOT_FOUND = 4000,
