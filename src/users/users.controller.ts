@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -16,14 +18,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { SigninRequestDto } from '../auth/dto/signin.request.dto';
-import { SigninResponseDto } from '../auth/dto/signin.response.dto';
-
 import { AccessTokenGuard } from '../guard/access.token.guard';
+import customErrorCode from '../type/custom.error.code';
+
 import { GetMyInfoResponseDto } from './dto/getMyInfo.response.dto';
 import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
 import { UpdateMyInfoResponseDto } from './dto/updateMyInfo.response.dto';
 import { DeleteMyInfoResponseDto } from './dto/deleteMyInfo.response.dto';
+import { FollowRequestDto } from './dto/follow.request.dto';
+import { FollowResponseDto } from './dto/follow.response.dto';
+import { UnfollowResponseDto } from './dto/unfollow.response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -42,15 +46,15 @@ export class UsersController {
     type: GetMyInfoResponseDto,
   })
   @ApiResponse({
-    status: 3000,
-    description: '존재하지 않는 유저',
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '존재하지 않는 유저입니다!',
-          code: 3000,
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
         },
       },
     },
@@ -74,15 +78,15 @@ export class UsersController {
     type: UpdateMyInfoResponseDto,
   })
   @ApiResponse({
-    status: 3000,
-    description: '존재하지 않는 유저',
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '존재하지 않는 유저입니다!',
-          code: 3000,
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
         },
       },
     },
@@ -127,15 +131,15 @@ export class UsersController {
     type: DeleteMyInfoResponseDto,
   })
   @ApiResponse({
-    status: 3000,
-    description: '존재하지 않는 유저',
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '존재하지 않는 유저입니다!',
-          code: 3000,
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
         },
       },
     },
@@ -149,35 +153,45 @@ export class UsersController {
 
   @Post('follow')
   @UseGuards(AccessTokenGuard)
-  async follow(@Body() data: SigninRequestDto) {
-    // const response = await this.usersService.getMyInfo(data.snsId);
-    // return new SigninResponseDto(response);
+  async follow(@Req() request, @Body() data: FollowRequestDto) {
+    const response = await this.usersService.follow(
+      request.userId,
+      data.nickname,
+    );
+
+    return new FollowResponseDto(response);
   }
 
   @Get('follow')
   @UseGuards(AccessTokenGuard)
-  async getFollow(@Body() data: SigninRequestDto) {
+  async getFollow() {
     // const response = await this.usersService.getMyInfo(data.snsId);
     // return new SigninResponseDto(response);
   }
 
   @Get('follower')
   @UseGuards(AccessTokenGuard)
-  async getFollower(@Req() request) {
-    const response = await this.usersService.getMyInfo(request.userId);
-    return response;
-  }
+  async getFollower(@Req() request) {}
 
   @Delete('follow')
   @UseGuards(AccessTokenGuard)
-  async unfollow(@Body() data: SigninRequestDto) {
-    // const response = await this.usersService.getMyInfo(data.snsId);
-    // return new SigninResponseDto(response);
+  async unfollow(@Req() request, @Param('userId') userId: number) {
+    // string이 형변환 되는 것 방지
+    if (typeof userId !== 'number') {
+      throw new BadRequestException({
+        message: 'userId는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_PARAM,
+      });
+    }
+
+    const response = await this.usersService.unFollow(request.userId, userId);
+
+    return new UnfollowResponseDto(response);
   }
 
   @Patch('fcm')
   @UseGuards(AccessTokenGuard)
-  async updateFcmToken(@Body() data: SigninRequestDto) {
+  async updateFcmToken() {
     // const response = await this.usersService.getMyInfo(data.snsId);
     // return new SigninResponseDto(response);
   }

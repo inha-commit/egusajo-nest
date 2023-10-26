@@ -25,10 +25,20 @@ type DeleteMyInfoResponse = {
   success: boolean;
 };
 
+type FollowResponse = {
+  success: boolean;
+};
+
+type UnFollowResponse = {
+  success: boolean;
+};
+
 export type {
   AccessToken,
   Tokens,
   NicknameValidationResponse,
   User,
   DeleteMyInfoResponse,
+  FollowResponse,
+  UnFollowResponse,
 };

@@ -11,7 +11,12 @@ import { DataSource, Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import customErrorCode from '../type/custom.error.code';
 import { ModelConverter } from '../type/model.converter';
-import { DeleteMyInfoResponse, User } from '../type/type';
+import {
+  DeleteMyInfoResponse,
+  FollowResponse,
+  UnFollowResponse,
+  User,
+} from '../type/type';
 
 @Injectable()
 export class UsersService {
@@ -33,8 +38,8 @@ export class UsersService {
 
     if (!user) {
       throw new BadRequestException({
-        message: '존재하지 않는 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
       });
     }
 
@@ -64,8 +69,8 @@ export class UsersService {
 
     if (!user) {
       throw new BadRequestException({
-        message: '존재하지 않는 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
       });
     }
 
@@ -81,31 +86,21 @@ export class UsersService {
       });
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // profileImage등록 안하면 기본 이미지로 설정
-      if (!profileImgSrc) {
-        profileImgSrc = 'basic.png';
-      }
-
-      // 유저 정보 수정
-      user.nickname = nickname;
-      user.fcmId = fcmId;
-      user.birthday = birthday;
-      user.profileImgSrc = profileImgSrc;
-      user.alarm = alarm;
-
-      await queryRunner.manager.save(user);
-
-      return ModelConverter.user(user);
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
+    // profileImage등록 안하면 기본 이미지로 설정
+    if (!profileImgSrc) {
+      profileImgSrc = 'basic.png';
     }
+
+    // 유저 정보 수정
+    user.nickname = nickname;
+    user.fcmId = fcmId;
+    user.birthday = birthday;
+    user.profileImgSrc = profileImgSrc;
+    user.alarm = alarm;
+
+    await this.userRepository.save(user);
+
+    return ModelConverter.user(user);
   }
 
   /**
@@ -119,24 +114,99 @@ export class UsersService {
 
     if (!user) {
       throw new BadRequestException({
-        message: '존재하지 않는 유저입니다!',
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    user.deletedAt = new Date();
+    await this.userRepository.save(user);
+
+    return { success: true };
+  }
+
+  /**
+   * 팔로우 하기
+   * @param userId
+   * @param nickname
+   */
+  async follow(userId: number, nickname: string): Promise<FollowResponse> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, deletedAt: null },
+      relations: ['Followings'],
+    });
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    // 팔로우 할 사람
+    const following = await this.userRepository.findOne({
+      where: { nickname: nickname, deletedAt: null },
+    });
+
+    if (!following) {
+      throw new BadRequestException({
+        message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      user.deletedAt = new Date();
-      await queryRunner.manager.save(user);
-
-      return { success: true };
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
+    // 이미 팔로우하고 있지 않은 경우에만 팔로우 걸기
+    if (!user.Followings.some((Following) => Following.id === following.id)) {
+      user.Followings.push(following);
+      await this.userRepository.save(user);
     }
+
+    return { success: true };
+  }
+
+  /**
+   * 팔로우 취소
+   * @param userId
+   * @param followingId
+   */
+  async unFollow(
+    userId: number,
+    followingId: number,
+  ): Promise<UnFollowResponse> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, deletedAt: null },
+      relations: ['Followings'],
+    });
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    // 언팔로우 할 사람
+    const following = await this.userRepository.findOne({
+      where: { id: followingId, deletedAt: null },
+    });
+
+    if (!following) {
+      throw new BadRequestException({
+        message: '존재하지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_FOUND,
+      });
+    }
+
+    // 팔로우 중인 경우에만 언팔로우를 수행.
+    const indexOfFollowing = user.Followings.findIndex(
+      (Following) => Following.id === following.id,
+    );
+
+    if (indexOfFollowing !== -1) {
+      following.Followers.splice(indexOfFollowing, 1);
+      await this.userRepository.save(user);
+    }
+
+    return { success: true };
   }
 }

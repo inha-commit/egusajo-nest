@@ -28,7 +28,8 @@ enum CustomErrorCode {
   IMAGE_NOT_FOUND = 6000,
 
   // request 요청 에러
-  WRONG_REQUEST = 7000,
+  INVALID_PARAM = 7000,
+  INVALID_QUERY = 7001,
 
   // validation 에러
   VALIDATION_ERROR = 8000,
