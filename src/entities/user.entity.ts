@@ -13,7 +13,6 @@ import {
 } from 'typeorm';
 import { PresentEntity } from './present.entity';
 import { FundingEntity } from './funding.entity';
-import { UserImageEntity } from './userImage.entity';
 
 @Entity({ schema: `${process.env.DATABASE_NAME}`, name: 'User' })
 export class UserEntity {
@@ -32,6 +31,10 @@ export class UserEntity {
   // 유저 생일
   @Column('varchar', { length: 8 })
   birthday: string;
+
+  // 유저 이미지
+  @Column('varchar')
+  profileImgSrc: string;
 
   // fcm 알림 받을 고유 id
   @Column('varchar', { unique: true })
@@ -73,9 +76,9 @@ export class UserEntity {
   Present: PresentEntity[];
 
   // UserImageEntity와의 관계
-  @OneToOne(() => UserImageEntity, (userImages) => userImages.User)
-  @JoinColumn([{ name: 'UserImageId', referencedColumnName: 'id' }])
-  UserImage: UserImageEntity;
+  // @OneToOne(() => UserImageEntity, (userImages) => userImages.User)
+  // @JoinColumn([{ name: 'UserImageId', referencedColumnName: 'id' }])
+  // UserImage: UserImageEntity;
 
   // FudingEntity와의 관계 - 펀딩한 사람
   @OneToMany(() => FundingEntity, (fundings) => fundings.Sender)

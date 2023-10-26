@@ -10,7 +10,6 @@ import { UserEntity } from '../entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
-import { UserImageEntity } from '../entities/userImage.entity';
 import customErrorCode from '../type/custom.error.code';
 
 @Injectable()
@@ -34,8 +33,8 @@ export class AuthService {
 
     if (!user) {
       throw new BadRequestException({
-        message: '존재하지 않는 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
       });
     }
 
@@ -98,25 +97,22 @@ export class AuthService {
     await queryRunner.startTransaction();
 
     try {
+      // profileImage등록 안하면 기본 이미지로 설정
+      if (!profileImageSrc) {
+        profileImageSrc = 'basic.png';
+      }
+
       // 유저 저장
       const newUser = new UserEntity();
       newUser.snsId = snsId;
       newUser.nickname = nickname;
       newUser.fcmId = fcmId;
       newUser.birthday = birthday;
+      newUser.profileImgSrc = profileImageSrc;
       newUser.alarm = true;
 
-      // 유저 이미지 저장
-      const userImage = new UserImageEntity();
       await queryRunner.manager.save(newUser);
 
-      // profileImage등록 안하면 기본 이미지로 설정
-      if (!profileImageSrc) {
-        profileImageSrc = 'basic.png';
-      }
-
-      userImage.src = profileImageSrc;
-      await queryRunner.manager.save(userImage);
       this.logger.log('new user join');
 
       return this.createToken(newUser.id);
