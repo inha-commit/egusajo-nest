@@ -30,13 +30,13 @@ export class AuthController {
   })
   @ApiResponse({
     status: 1002,
-    description: '존재하지 않는 유저',
+    description: '회원가입 되지 않은 유저',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '존재하지 않는 유저입니다!',
+          description: '회원가입 되지 않은 유저입니다!',
           code: 1002,
         },
       },

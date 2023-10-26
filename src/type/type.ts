@@ -1,3 +1,4 @@
+// Auth
 type AccessToken = {
   accessToken: string;
 };
@@ -11,4 +12,33 @@ type NicknameValidationResponse = {
   success: boolean;
 };
 
-export type { AccessToken, Tokens, NicknameValidationResponse };
+// User
+type User = {
+  nickname: string;
+  birthday: string;
+  profileImgSrc: string;
+  fcmId: string;
+  alarm: boolean;
+};
+
+type DeleteMyInfoResponse = {
+  success: boolean;
+};
+
+type FollowResponse = {
+  success: boolean;
+};
+
+type UnFollowResponse = {
+  success: boolean;
+};
+
+export type {
+  AccessToken,
+  Tokens,
+  NicknameValidationResponse,
+  User,
+  DeleteMyInfoResponse,
+  FollowResponse,
+  UnFollowResponse,
+};

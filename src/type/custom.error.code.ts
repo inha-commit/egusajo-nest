@@ -1,8 +1,8 @@
 enum CustomErrorCode {
   // 인증 관련 에러 코드
   INVALID_LOGIN = 1000,
-  USER_ALREADY_EXIST = 1001,
-  USER_NOT_FOUND = 1002,
+  USER_ALREADY_EXIST = 1001, // 이미 존재하는데 회원가입 하는 경우
+  USER_NOT_AUTHENTICATED = 1002, // 회원가입되지 않은 유저를 로그인 하는 경우
   INVALID_NICKNAME = 1100, // 닉네임에 욕설 및 비속어 포함
   DUPLICATE_NICKNAME = 1101, // 이미 존재하는 닉네임
 
@@ -16,7 +16,7 @@ enum CustomErrorCode {
   INVALID_REFRESH_TOKEN = 2102,
 
   // 유저 관련 에러 코드
-  USER = 3000,
+  USER_NOT_FOUND = 3000,
 
   // 선물 관련 에러 코드
   PRESENT_NOT_FOUND = 4000,
@@ -28,7 +28,8 @@ enum CustomErrorCode {
   IMAGE_NOT_FOUND = 6000,
 
   // request 요청 에러
-  WRONG_REQUEST = 7000,
+  INVALID_PARAM = 7000,
+  INVALID_QUERY = 7001,
 
   // validation 에러
   VALIDATION_ERROR = 8000,

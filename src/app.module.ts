@@ -4,6 +4,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,7 +13,6 @@ import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 
 import { CustomErrorFilter } from './type/custom.error.filter';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
