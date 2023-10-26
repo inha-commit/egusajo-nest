@@ -14,6 +14,7 @@ type NicknameValidationResponse = {
 
 // User
 type User = {
+  id: number;
   nickname: string;
   birthday: string;
   profileImgSrc: string;
