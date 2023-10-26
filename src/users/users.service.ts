@@ -164,6 +164,8 @@ export class UsersService {
     return { success: true };
   }
 
+  async getFollowings(userId: number) {}
+
   /**
    * 팔로우 취소
    * @param userId

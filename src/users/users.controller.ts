@@ -14,6 +14,7 @@ import {
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -28,6 +29,7 @@ import { DeleteMyInfoResponseDto } from './dto/deleteMyInfo.response.dto';
 import { FollowRequestDto } from './dto/follow.request.dto';
 import { FollowResponseDto } from './dto/follow.response.dto';
 import { UnfollowResponseDto } from './dto/unfollow.response.dto';
+import { number } from 'joi';
 
 @ApiTags('users')
 @Controller('users')
@@ -151,6 +153,42 @@ export class UsersController {
     return new DeleteMyInfoResponseDto(response);
   }
 
+  @ApiOperation({
+    summary: '유저 팔로우',
+    description: 'FollowRequestDto | FollowResponseDto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @ApiResponse({
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 3000,
+    description: '존재하지 않는 유저를 팔로우 하는경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '존재하지 않은 유저입니다!',
+          code: 3000,
+        },
+      },
+    },
+  })
   @Post('follow')
   @UseGuards(AccessTokenGuard)
   async follow(@Req() request, @Body() data: FollowRequestDto) {
@@ -162,17 +200,74 @@ export class UsersController {
     return new FollowResponseDto(response);
   }
 
-  @Get('follow')
+  @ApiOperation({
+    summary: '내가 팔로우 하는 유저들 목록 가져오기',
+    description: 'FollowRequestDto | FollowResponseDto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @Get('me/followings')
   @UseGuards(AccessTokenGuard)
-  async getFollow() {
-    // const response = await this.usersService.getMyInfo(data.snsId);
+  async getFollowings(@Req() request) {
+    const response = await this.usersService.getFollowings(request.userId);
     // return new SigninResponseDto(response);
   }
 
-  @Get('follower')
+  @ApiOperation({
+    summary: '나를 팔로우 하는 유저들 목록 가져오기',
+    description: 'FollowRequestDto | FollowResponseDto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @Get('me/followers')
   @UseGuards(AccessTokenGuard)
-  async getFollower(@Req() request) {}
+  async getFollowers(@Req() request) {}
 
+  @ApiOperation({
+    summary: '유저 언팔로우',
+    description: 'UnfollowResponseDto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: '팔로우 취소할 유저 id',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 3000,
+    description: '존재하지 않는 유저를 팔로우 하는경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '존재하지 않은 유저입니다!',
+          code: 3000,
+        },
+      },
+    },
+  })
   @Delete('follow')
   @UseGuards(AccessTokenGuard)
   async unfollow(@Req() request, @Param('userId') userId: number) {
