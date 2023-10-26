@@ -13,11 +13,15 @@ import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 
 import { CustomErrorFilter } from './type/custom.error.filter';
+import { FollowsController } from './follows/follows.controller';
+import { FollowsService } from './follows/follows.service';
+import { FollowsModule } from './follows/follows.module';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
+    FollowsModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
