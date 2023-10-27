@@ -5,7 +5,7 @@ import {
   Logger,
   LoggerService,
 } from '@nestjs/common';
-import { FollowResponse, UnFollowResponse, User } from '../type/type';
+import { Follower, FollowResponse, UnFollowResponse, User } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
@@ -22,11 +22,56 @@ export class FollowsService {
   ) {}
 
   /**
-   * 팔로우 하기
+   * Id로 팔로우 하기
+   * @param userId
+   * @param followingId
+   */
+  async followById(
+    userId: number,
+    followingId: number,
+  ): Promise<FollowResponse> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, deletedAt: null },
+      relations: ['Followings'],
+    });
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    // 팔로우 할 사람
+    const following = await this.userRepository.findOne({
+      where: { id: followingId, deletedAt: null },
+    });
+
+    if (!following) {
+      throw new BadRequestException({
+        message: '존재하지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_FOUND,
+      });
+    }
+
+    // 이미 팔로우하고 있지 않은 경우에만 팔로우 걸기
+    if (!user.Followings.some((Following) => Following.id === following.id)) {
+      user.Followings.push(following);
+      await this.userRepository.save(user);
+    }
+
+    return { success: true };
+  }
+
+  /**
+   * 닉네임으로 팔로우 하기
    * @param userId
    * @param nickname
    */
-  async follow(userId: number, nickname: string): Promise<FollowResponse> {
+  async followByNickname(
+    userId: number,
+    nickname: string,
+  ): Promise<FollowResponse> {
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
       relations: ['Followings'],
@@ -61,7 +106,7 @@ export class FollowsService {
   }
 
   /**
-   * 팔로우 목록 가져오기
+   * 팔로앙 목록 가져오기
    * @param userId
    */
   async getFollowings(userId: number): Promise<User[]> {
@@ -86,10 +131,10 @@ export class FollowsService {
    * 팔로워 목록 가져오기
    * @param userId
    */
-  async getFollowers(userId: number): Promise<User[]> {
+  async getFollowers(userId: number): Promise<Follower[]> {
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
-      relations: ['Followers'],
+      relations: ['Followers', 'Followings'],
     });
 
     if (!user) {
@@ -99,9 +144,22 @@ export class FollowsService {
       });
     }
 
-    return user.Followers.map((Follower) => {
-      return ModelConverter.user(Follower);
+    const followings = user.Followings;
+    const followers = user.Followers;
+    const followersWithFlag: Follower[] = [];
+
+    followers.forEach((follower) => {
+      const isFollowing = followings.some(
+        (following) => following.id === follower.id,
+      );
+
+      followersWithFlag.push({
+        ...ModelConverter.user(follower),
+        isFollowing: isFollowing,
+      });
     });
+
+    return followersWithFlag;
   }
 
   /**
