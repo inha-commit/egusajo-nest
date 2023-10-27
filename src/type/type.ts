@@ -26,6 +26,18 @@ type DeleteMyInfoResponse = {
   success: boolean;
 };
 
+// Follow
+
+type Follower = {
+  id: number;
+  nickname: string;
+  birthday: string;
+  profileImgSrc: string;
+  fcmId: string;
+  alarm: boolean;
+  isFollowing: boolean;
+};
+
 type FollowResponse = {
   success: boolean;
 };
@@ -40,6 +52,7 @@ export type {
   NicknameValidationResponse,
   User,
   DeleteMyInfoResponse,
+  Follower,
   FollowResponse,
   UnFollowResponse,
 };

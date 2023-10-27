@@ -25,11 +25,18 @@ class GetFollowerResponseDto {
   })
   public profileImgSrc: string;
 
+  @ApiProperty({
+    name: 'isFollowing',
+    description: '내가 팔로우 하고 있는지 여부',
+  })
+  public isFollowing: boolean;
+
   constructor(obj: GetFollowerResponseDto) {
     this.id = obj.id;
     this.nickname = obj.nickname;
     this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
+    this.isFollowing = obj.isFollowing;
   }
 }
 
@@ -43,6 +50,7 @@ export class GetFollowersResponseDto {
       nickname: item.nickname,
       birthday: item.birthday,
       profileImgSrc: item.profileImgSrc,
+      isFollowing: item.isFollowing,
     }));
   }
 }
