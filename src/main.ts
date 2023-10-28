@@ -24,16 +24,20 @@ async function bootstrap() {
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
 
-    const { ip, method, originalUrl } = req;
-    const userAgent = req.get('user-agent') || '';
+    const { method, originalUrl } = req;
 
     res.on('finish', () => {
       const { statusCode } = res;
       const logger = new Logger();
       const duration = Date.now() - start;
-      logger.log(
-        `[${method}] ${originalUrl} ${ip}-${userAgent} ${statusCode}status-${duration}ms`,
-      );
+
+      if (statusCode < 400) {
+        logger.log(`[${method}] ${originalUrl} ${duration}ms`);
+      } else if (statusCode < 500) {
+        logger.warn(`[${method}] ${originalUrl} ${duration}ms`);
+      } else {
+        logger.error(`[${method}] ${originalUrl} ${duration}ms`);
+      }
     });
     next();
   });

@@ -10,18 +10,38 @@ import {
 import { Response } from 'express';
 import customErrorCode from './custom.error.code';
 
-@Catch(HttpException)
+@Catch()
 export class CustomErrorFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
     if (exception instanceof BadRequestException) {
       const status = exception.getStatus();
       const errors = exception.getResponse() as {
-        message: string;
+        message: string | string[];
         code: number;
       };
+
+      // validation error인 경우
+      if (Array.isArray(errors.message)) {
+        return response.status(status).json({
+          statusCode: status,
+          message: 'BAD REQUEST ERROR',
+          description: errors.message.join(','),
+          code: 8000,
+        });
+      }
+
+      // token expired error만 따로 401 응답
+      if (errors.code === 2001) {
+        return response.status(401).json({
+          statusCode: status,
+          message: 'BAD REQUEST ERROR',
+          description: errors.message,
+          code: errors.code,
+        });
+      }
 
       response.status(status).json({
         statusCode: status,
@@ -63,10 +83,11 @@ export class CustomErrorFilter implements ExceptionFilter {
         code: errors.code,
       });
     } else {
+      console.log(exception);
       response.status(500).json({
         statusCode: 500,
         message: 'UNCATCHED ERROR',
-        description: exception,
+        description: exception.message ? exception.message : null,
         code: customErrorCode.UNCATCHED_ERROR,
       });
     }
