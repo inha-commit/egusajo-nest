@@ -170,8 +170,8 @@ export class FollowsController {
       },
     },
   })
-  @Get('me/followings')
   @UseGuards(AccessTokenGuard)
+  @Get('me/followings')
   async getFollowings(@Req() request) {
     const response = await this.followsService.getFollowings(request.userId);
 
