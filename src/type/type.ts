@@ -27,7 +27,6 @@ type DeleteMyInfoResponse = {
 };
 
 // Follow
-
 type Follower = {
   id: number;
   nickname: string;
@@ -45,6 +44,8 @@ type FollowResponse = {
 type UnFollowResponse = {
   success: boolean;
 };
+
+// Image
 
 export type {
   AccessToken,
