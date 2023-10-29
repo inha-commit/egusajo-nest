@@ -48,6 +48,10 @@ jobs:
             S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
             S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
             S3_REGION=${{ secrets.S3_REGION }}
+            SLACK_BOT_TOKEN=${{ secrets.SLACK_BOT_TOKEN }}
+            SLACK_NEW_USER_CHANNEL_ID=${{ secrets.SLACK_NEW_USER_CHANNEL_ID }}
+            SLACK_API_LATENCY_CHANNEL_ID=${{ secrets.SLACK_API_LATENCY_CHANNEL_ID }}
+            SLACK_FATAL_ERROR_CHANNEL_ID=${{ secrets.SLACK_FATAL_ERROR_CHANNEL_ID }}
 
   code-deploy:
     needs: build-and-push-image

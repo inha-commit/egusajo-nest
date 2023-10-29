@@ -15,6 +15,7 @@ import { TypeormConfigService } from './config/typeorm.config.service';
 import { CustomErrorFilter } from './type/custom.error.filter';
 import { FollowsModule } from './follows/follows.module';
 import { ImagesModule } from './images/images.module';
+import { SlackApiClient } from './utils/slack.api.client';
 
 @Module({
   imports: [
@@ -43,10 +44,12 @@ import { ImagesModule } from './images/images.module';
   providers: [
     AppService,
     Logger,
+    SlackApiClient,
     {
       provide: APP_FILTER,
       useClass: CustomErrorFilter,
     },
   ],
+  exports: [SlackApiClient],
 })
 export class AppModule {}

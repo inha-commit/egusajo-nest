@@ -11,6 +11,7 @@ import { DataSource, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
+import { SlackApiClient } from '../utils/slack.api.client';
 
 @Injectable()
 export class AuthService {
@@ -113,7 +114,9 @@ export class AuthService {
 
       await queryRunner.manager.save(newUser);
 
-      this.logger.log('new user join');
+      const slackClient = new SlackApiClient();
+
+      await slackClient.newUser();
 
       return this.createToken(newUser.id);
     } catch (e) {
