@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import customErrorCode from './custom.error.code';
+import { SlackApiClient } from '../utils/slack.api.client';
 
 @Catch()
 export class CustomErrorFilter implements ExceptionFilter {
@@ -83,7 +84,12 @@ export class CustomErrorFilter implements ExceptionFilter {
         code: errors.code,
       });
     } else {
-      console.log(exception);
+      const slackClient = new SlackApiClient();
+
+      (async () => {
+        await slackClient.fatalError(exception.message);
+      })();
+
       response.status(500).json({
         statusCode: 500,
         message: 'UNCATCHED ERROR',
