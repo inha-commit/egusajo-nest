@@ -114,8 +114,7 @@ export class UsersService {
       });
     }
 
-    user.deletedAt = new Date();
-    await this.userRepository.save(user);
+    await this.userRepository.softDelete({ id: userId });
 
     return { success: true };
   }

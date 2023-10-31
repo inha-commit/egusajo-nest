@@ -45,7 +45,18 @@ type UnFollowResponse = {
   success: boolean;
 };
 
-// Image
+// Present
+type CreatePresentResponse = {
+  success: boolean;
+};
+
+type UpdatePresentResponse = {
+  success: boolean;
+};
+
+type DeletePresentResponse = {
+  success: boolean;
+};
 
 export type {
   AccessToken,
@@ -56,4 +67,7 @@ export type {
   Follower,
   FollowResponse,
   UnFollowResponse,
+  CreatePresentResponse,
+  UpdatePresentResponse,
+  DeletePresentResponse,
 };

@@ -31,7 +31,7 @@ export class FundingEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ nullable: true })
   deletedAt: Date | null;
 
   // PresentEntity와의 관계

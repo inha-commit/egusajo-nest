@@ -42,6 +42,7 @@ async function bootstrap() {
         logger.error(`[${method}] ${originalUrl} ${duration}ms`);
       }
 
+      // TODO: production 일때만
       if (duration > 2000) {
         slackClient.sendApiLatency(method, originalUrl, duration);
       }
