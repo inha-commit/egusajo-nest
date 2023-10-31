@@ -56,7 +56,7 @@ export class ImagesController {
     @UploadedFiles() files: Express.MulterS3.File[],
     @Query('type') type: string,
   ) {
-    if (type !== 'users' && type !== 'presents') {
+    if (type !== 'users' && type !== 'presents' && !type) {
       throw new BadRequestException({
         message: 'Query형식이 잘못되었습니다.',
         code: customErrorCode.INVALID_QUERY,

@@ -16,12 +16,14 @@ import { CustomErrorFilter } from './type/custom.error.filter';
 import { FollowsModule } from './follows/follows.module';
 import { ImagesModule } from './images/images.module';
 import { SlackApiClient } from './utils/slack.api.client';
+import { PresentsModule } from './presents/presents.module';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     FollowsModule,
+    PresentsModule,
     ImagesModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],

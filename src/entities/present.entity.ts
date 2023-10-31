@@ -24,8 +24,8 @@ export class PresentEntity {
   name: string;
 
   // 생일 선물 제품 정보 링크
-  @Column('varchar')
-  productLink: string;
+  @Column({ type: 'varchar', nullable: true })
+  productLink: string | null;
 
   // 펀딩 완료 여부
   @Column('boolean')
@@ -39,6 +39,10 @@ export class PresentEntity {
   @Column('int')
   money: number;
 
+  // 펀딩 마감일
+  @Column('date')
+  deadline: Date;
+
   // 대표 이미지
   @Column('varchar')
   representImage: string;
@@ -51,7 +55,7 @@ export class PresentEntity {
   @Column('text')
   longComment: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ nullable: true })
   createdAt: Date;
 
   @UpdateDateColumn()
