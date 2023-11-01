@@ -46,6 +46,19 @@ type UnFollowResponse = {
 };
 
 // Present
+type Present = {
+  id: number;
+  name: string;
+  productLink: string;
+  complete: boolean;
+  goal: number;
+  money: number;
+  deadline: Date;
+  representImage: string;
+  shortComment: string;
+  longComment: string;
+};
+
 type CreatePresentResponse = {
   success: boolean;
 };
@@ -58,6 +71,12 @@ type DeletePresentResponse = {
   success: boolean;
 };
 
+// PresentImage
+type PresentImage = {
+  id: number;
+  src: string;
+};
+
 export type {
   AccessToken,
   Tokens,
@@ -67,7 +86,9 @@ export type {
   Follower,
   FollowResponse,
   UnFollowResponse,
+  Present,
   CreatePresentResponse,
   UpdatePresentResponse,
   DeletePresentResponse,
+  PresentImage,
 };
