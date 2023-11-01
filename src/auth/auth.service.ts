@@ -118,6 +118,8 @@ export class AuthService {
 
       await slackClient.newUser();
 
+      await queryRunner.commitTransaction();
+
       return this.createToken(newUser.id);
     } catch (e) {
       await queryRunner.rollbackTransaction();

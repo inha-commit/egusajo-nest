@@ -128,9 +128,9 @@ export class FollowsController {
   })
   @Post('/:userId')
   @UseGuards(AccessTokenGuard)
-  async followById(@Req() request, @Param('userId') userId: number) {
+  async followById(@Req() request, @Param('userId') userId: string) {
     // string이 형변환 되는 것 방지
-    if (typeof userId !== 'number') {
+    if (!userId || typeof parseInt(userId) !== 'number') {
       throw new BadRequestException({
         message: 'userId는 number type이어야 합니다!',
         code: customErrorCode.INVALID_PARAM,
@@ -139,7 +139,7 @@ export class FollowsController {
 
     const response = await this.followsService.followById(
       request.userId,
-      userId,
+      parseInt(userId),
     );
 
     return new FollowResponseDto(response);
@@ -271,16 +271,19 @@ export class FollowsController {
   })
   @Delete('/:userId')
   @UseGuards(AccessTokenGuard)
-  async unfollow(@Req() request, @Param('userId') userId: number) {
+  async unfollow(@Req() request, @Param('userId') userId: string) {
     // string이 형변환 되는 것 방지
-    if (!userId || typeof userId !== 'number') {
+    if (!userId || typeof parseInt(userId) !== 'number') {
       throw new BadRequestException({
         message: 'userId는 number type이어야 합니다!',
         code: customErrorCode.INVALID_PARAM,
       });
     }
 
-    const response = await this.followsService.unFollow(request.userId, userId);
+    const response = await this.followsService.unFollow(
+      request.userId,
+      parseInt(userId),
+    );
 
     return new UnfollowResponseDto(response);
   }

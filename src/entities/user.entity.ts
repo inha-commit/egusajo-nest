@@ -60,7 +60,7 @@ export class UserEntity {
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'FollwerId',
+      name: 'FollowerId',
       referencedColumnName: 'id',
     },
   })

@@ -26,6 +26,9 @@ import { UpdatePresentResponseDto } from './dto/updatePresent.response.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
 import { DeletePresentResponseDto } from './dto/deletePresent.response.dto';
 import customErrorCode from '../type/custom.error.code';
+import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
+import { GetPresentResponseDto } from './dto/getPresent.response.dto';
+import { CreateFundingResponseDto } from './dto/createFunding.response.dto';
 
 @ApiTags('presents')
 @Controller('presents')
@@ -117,39 +120,90 @@ export class PresentsController {
     return new CreatePresentResponseDto(response);
   }
 
-  // @ApiOperation({
-  //   summary: '나와 친구들 선물 게시물 가져오기',
-  //   description: 'Dto',
-  // })
-  // @Get('/')
-  // async getPresents() {}
-  //
-  // @ApiOperation({
-  //   summary: '특정 유저의 선물 게시물들 가져오기',
-  //   description: 'Dto',
-  // })
-  // @Get('/:pr')
-  // async getPresent() {}
+  @ApiOperation({
+    summary: '나와 친구들 선물 게시물 가져오기',
+    description: 'Dto',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Get('/')
+  async getPresents(@Req() request) {
+    await this.presentsService.getPresents(request.userId);
+  }
 
   @ApiOperation({
     summary: '특정 선물 게시물 가져오기',
     description: 'Dto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
   })
   @ApiParam({
     name: 'presentId',
     description: '가져올 선물 Id',
     type: Number,
   })
+  @ApiResponse({
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 7000,
+    description: '절못된 parameter 전송',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: 'presentId는 number type이어야 합니다!',
+          code: 7000,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 4000,
+    description: '존재하지 않는 게시글에 접근할 때',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '존재하지 않는 게시글 입니다!',
+          code: 4000,
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    type: GetPresentResponseDto,
+  })
+  @UseGuards(AccessTokenGuard)
   @Get('/:presentId')
-  async getPresent(@Param('presentId') presentId: number) {
-    if (!presentId || typeof presentId !== 'number') {
+  async getPresent(@Req() request, @Param('presentId') presentId: string) {
+    if (!presentId || typeof parseInt(presentId) !== 'number') {
       throw new BadRequestException({
         message: 'presentId는 number type이어야 합니다!',
         code: customErrorCode.INVALID_PARAM,
       });
     }
 
-    await this.presentsService.getPresent(presentId);
+    const response = await this.presentsService.getPresent(
+      request.userId,
+      parseInt(presentId),
+    );
+
+    return new GetPresentResponseDto(response);
   }
 
   @ApiOperation({
@@ -370,5 +424,130 @@ export class PresentsController {
     );
 
     return new DeletePresentResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '선물에 대해 펀딩하기',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @ApiParam({
+    name: 'presentId',
+    description: '가져올 선물 Id',
+    type: Number,
+  })
+  @ApiOkResponse({
+    type: CreateFundingResponseDto,
+  })
+  @ApiResponse({
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 7000,
+    description: '절못된 parameter 전송',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: 'presentId는 number type이어야 합니다!',
+          code: 7000,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 5001,
+    description: '펀딩 금액이 0원인 경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '금액은 최소 0원 이상이어야 합니다!',
+          code: 5001,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 5002,
+    description: '펀딩 날짜가 지난 펀딩에 대해 펀딩하려는 경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '이미 종료된 펀딩입니다!',
+          code: 5002,
+        },
+      },
+    },
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/:presentId/funds')
+  async createFunding(
+    @Req() request,
+    @Param('presentId') presentId: string,
+    @Body() data: CreateFundingRequestDto,
+  ) {
+    if (!presentId || typeof parseInt(presentId) !== 'number') {
+      throw new BadRequestException({
+        message: 'presentId는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_PARAM,
+      });
+    }
+
+    const response = await this.presentsService.createFunding(
+      request.userId,
+      parseInt(presentId),
+      data.cost,
+      data.comment,
+    );
+
+    return new CreateFundingResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '펀딩 취소하기',
+  })
+  @Delete('/:presentId/funds/:fundId')
+  async deleteFunding(
+    @Req() request,
+    @Param('presentId') presentId: string,
+    @Param('fundId') fundId: string,
+  ) {
+    if (!presentId || typeof parseInt(presentId) !== 'number') {
+      throw new BadRequestException({
+        message: 'presentId는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_PARAM,
+      });
+    }
+
+    if (!fundId || typeof parseInt(fundId) !== 'number') {
+      throw new BadRequestException({
+        message: 'presentId는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_PARAM,
+      });
+    }
+
+    await this.presentsService.deleteFunding(
+      request.userId,
+      parseInt(presentId),
+      parseInt(fundId),
+    );
   }
 }
