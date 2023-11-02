@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PresentEntity } from '../entities/present.entity';
 import { PresentImageEntity } from '../entities/presentImage.entity';
 import customErrorCode from '../type/custom.error.code';
 import {
   CreatePresentResponse,
   DeletePresentResponse,
+  PresentWithUser,
   UpdatePresentResponse,
 } from '../type/type';
 import { FundingEntity } from '../entities/funding.entity';
@@ -118,10 +119,15 @@ export class PresentsService {
     }
   }
 
-  async getPresents(userId) {
+  /**
+   * 내가 팔로잉 하고 있는 사람들의 선물 게시글 가져오기 (10개씩 pagination 적용)
+   * @param userId
+   * @param page
+   */
+  async getPresents(userId: number, page: number): Promise<PresentWithUser[]> {
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
-      relations: ['Followings', 'Followings.Present'],
+      relations: ['Followings'],
     });
 
     if (!user) {
@@ -131,38 +137,30 @@ export class PresentsService {
       });
     }
 
-    // const followingPosts = await this.dataSource
-    //   .createQueryBuilder()
-    //   .select(['present.id', 'present.createdAt'])
-    //   .from(UserEntity, 'user')
-    //   .innerJoin('user.Followings', 'following')
-    //   .innerJoin('following.Present', 'present')
-    //   .where('user.id = :userId', { userId })
-    //   .andWhere('user.deletedAt IS NULL')
-    //   .orderBy('present.createdAt', 'DESC')
-    //   .limit(8)
-    //   .getMany();
+    const followingIds = user.Followings.map((following) => {
+      if (following.deletedAt === null) {
+        return following.id;
+      }
+    });
 
-    // const followers = await this.dataSource
-    //   .createQueryBuilder()
-    //   .select(['follow.FollowingId'])
-    //   .from(UserEntity, 'user')
-    //   .innerJoin('Follow', 'follow', 'follow.FollwerId = user.id')
-    //   .where('user.id = :userId', { userId: userId }) // YOUR_USER_ID를 원하는 userId로 대체
-    //   .andWhere('user.deletedAt IS NULL')
-    //   .getMany();
+    const presents = await this.dataSource
+      .createQueryBuilder(PresentEntity, 'present')
+      .innerJoinAndSelect('present.User', 'user')
+      .where('present.UserId IN (:...followingIds)', {
+        followingIds: followingIds,
+      })
+      .andWhere('present.deletedAt IS NULL')
+      .orderBy('present.createdAt', 'DESC')
+      .skip(page * 10)
+      .take(10)
+      .getMany();
 
-    // const posts = await this.dataSource
-    //   .createQueryBuilder()
-    //   .select(['present.id', 'present.name']) // 포스트 정보 선택
-    //   .from(PresentEntity, 'present')
-    //   .innerJoin(UserEntity, 'user', 'user.id = present.UserId')
-    //   .where('user.id IN (:...followerIds)', { followerIds }) // 팔로우한 유저들의 ID
-    //   .orderBy('present.createdAt', 'DESC') // 시간 순서대로 정렬
-    //   .limit(8) // 8개만 가져오기
-    //   .getMany(); // 포스트 정보 가져오기
-    //
-    // console.log(posts);
+    return presents.map((present) => {
+      return {
+        present: ModelConverter.present(present),
+        user: ModelConverter.user(present.User),
+      };
+    });
   }
 
   /**

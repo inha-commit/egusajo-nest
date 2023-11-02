@@ -9,18 +9,20 @@ export class SlackApiClient {
 
   async newUser() {
     try {
-      await this.web.chat.postMessage({
-        channel: process.env.SLACK_NEW_USER_CHANNEL_ID,
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: ':tada: *새로운 사용자가 가입했습니다!* :tada:',
+      if (process.env.NODE_ENV === 'production') {
+        await this.web.chat.postMessage({
+          channel: process.env.SLACK_NEW_USER_CHANNEL_ID,
+          blocks: [
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: ':tada: *새로운 사용자가 가입했습니다!* :tada:',
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
+      }
     } catch (error) {
       throw new Error(`메시지 전송에 실패했습니다: ${error.message}`);
     }
@@ -28,18 +30,20 @@ export class SlackApiClient {
 
   async sendApiLatency(method: string, url: string, time: number) {
     try {
-      await this.web.chat.postMessage({
-        channel: process.env.SLACK_API_LATENCY_CHANNEL_ID,
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: `:alarm_clock: *API 2000ms 초과* :alarm_clock:\n\nmethod: ${method}\nURL: ${url}\ntime: ${time}ms`,
+      if (process.env.NODE_ENV === 'production') {
+        await this.web.chat.postMessage({
+          channel: process.env.SLACK_API_LATENCY_CHANNEL_ID,
+          blocks: [
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `:alarm_clock: *API 2000ms 초과* :alarm_clock:\n\nmethod: ${method}\nURL: ${url}\ntime: ${time}ms`,
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
+      }
     } catch (error) {
       throw new Error(`메시지 전송에 실패했습니다: ${error.message}`);
     }
@@ -47,18 +51,20 @@ export class SlackApiClient {
 
   async fatalError(error: any) {
     try {
-      await this.web.chat.postMessage({
-        channel: process.env.SLACK_FATAL_ERROR_CHANNEL_ID,
-        blocks: [
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: `:fire: *치명적 에러가 발생했습니다* :fire:\n에러 내용: ${error}`,
+      if (process.env.NODE_ENV === 'production') {
+        await this.web.chat.postMessage({
+          channel: process.env.SLACK_FATAL_ERROR_CHANNEL_ID,
+          blocks: [
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `:fire: *치명적 에러가 발생했습니다* :fire:\n에러 내용: ${error}`,
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
+      }
     } catch (error) {
       throw new Error(`메시지 전송에 실패했습니다: ${error.message}`);
     }
