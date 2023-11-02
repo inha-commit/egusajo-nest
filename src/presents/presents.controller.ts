@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,6 +31,7 @@ import customErrorCode from '../type/custom.error.code';
 import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
 import { GetPresentResponseDto } from './dto/getPresent.response.dto';
 import { CreateFundingResponseDto } from './dto/createFunding.response.dto';
+import { GetPresentsResponseDto } from './dto/getPresents.response.dto';
 
 @ApiTags('presents')
 @Controller('presents')
@@ -37,7 +40,7 @@ export class PresentsController {
 
   @ApiOperation({
     summary: '선물 게시물 생성하기',
-    description: 'Dto',
+    description: 'CreatePresentRequestDto | CreatePresentResponseDto',
   })
   @ApiHeader({
     name: 'access_token',
@@ -122,17 +125,50 @@ export class PresentsController {
 
   @ApiOperation({
     summary: '나와 친구들 선물 게시물 가져오기',
-    description: 'Dto',
+    description: 'GetPresentsResponseDto',
+  })
+  @ApiHeader({
+    name: 'access_token',
+    description: '발급된 access token',
+  })
+  @ApiQuery({ name: 'page', type: Number, description: '페이지' })
+  @ApiOkResponse({
+    type: GetPresentsResponseDto,
+  })
+  @ApiResponse({
+    status: 1002,
+    description: '회원가입 되지 않은 유저',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '회원가입 되지 않은 유저입니다!',
+          code: 1002,
+        },
+      },
+    },
   })
   @UseGuards(AccessTokenGuard)
   @Get('/')
-  async getPresents(@Req() request) {
-    await this.presentsService.getPresents(request.userId);
+  async getPresents(@Req() request, @Query() query) {
+    if (!query.page || typeof parseInt(query.page) !== 'number') {
+      throw new BadRequestException({
+        message: 'page는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_QUERY,
+      });
+    }
+
+    const response = await this.presentsService.getPresents(
+      request.userId,
+      query.page,
+    );
+    return new GetPresentsResponseDto(response);
   }
 
   @ApiOperation({
     summary: '특정 선물 게시물 가져오기',
-    description: 'Dto',
+    description: 'GetPresentResponseDto',
   })
   @ApiHeader({
     name: 'access_token',
@@ -208,7 +244,7 @@ export class PresentsController {
 
   @ApiOperation({
     summary: '특정 선물 게시물 수정하기',
-    description: 'Dto',
+    description: 'UpdatePresentRequestDto | UpdatePresentResponseDto',
   })
   @ApiParam({
     name: 'presentId',
@@ -348,6 +384,7 @@ export class PresentsController {
 
   @ApiOperation({
     summary: '특정 선물 게시물 삭제하기',
+    description: 'DeletePresentResponseDto',
   })
   @ApiOkResponse({
     type: DeletePresentResponseDto,
@@ -428,6 +465,7 @@ export class PresentsController {
 
   @ApiOperation({
     summary: '선물에 대해 펀딩하기',
+    description: 'CreateFundingRequestDto | CreateFundingResponseDto',
   })
   @ApiHeader({
     name: 'access_token',

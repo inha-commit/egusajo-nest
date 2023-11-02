@@ -59,6 +59,11 @@ type Present = {
   longComment: string;
 };
 
+type PresentWithUser = {
+  user: User;
+  present: Present;
+};
+
 type CreatePresentResponse = {
   success: boolean;
 };
@@ -87,6 +92,7 @@ export type {
   FollowResponse,
   UnFollowResponse,
   Present,
+  PresentWithUser,
   CreatePresentResponse,
   UpdatePresentResponse,
   DeletePresentResponse,

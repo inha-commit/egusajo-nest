@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { PresentEntity } from './present.entity';
 import { FundingEntity } from './funding.entity';
+import { FollowEntity } from './follow.entity';
 
 @Entity({ schema: `${process.env.DATABASE_NAME}`, name: 'User' })
 export class UserEntity {
@@ -51,16 +52,15 @@ export class UserEntity {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  // 친구관계 테이블 설정
   @ManyToMany(() => UserEntity, (users) => users.Followings)
   @JoinTable({
     name: 'Follow',
     joinColumn: {
-      name: 'FollowingId',
+      name: 'followingId',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'FollowerId',
+      name: 'followerId',
       referencedColumnName: 'id',
     },
   })
@@ -68,6 +68,12 @@ export class UserEntity {
 
   @ManyToMany(() => UserEntity, (users) => users.Followers)
   Followings: UserEntity[];
+
+  @OneToMany(() => FollowEntity, (following) => following.followingId)
+  Following: UserEntity[];
+
+  @OneToMany(() => FollowEntity, (follower) => follower.followingId)
+  Follower: UserEntity[];
 
   // PresentEntity와의 관계
   @OneToMany(() => PresentEntity, (presents) => presents.User)

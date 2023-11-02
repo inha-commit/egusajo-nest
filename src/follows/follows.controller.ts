@@ -92,7 +92,7 @@ export class FollowsController {
   })
   @ApiParam({
     name: 'userId',
-    description: '팔로우 취소할 유저 id',
+    description: '팔로우 할 유저 id',
     type: Number,
   })
   @ApiOkResponse({
