@@ -11,12 +11,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ModelConverter } from '../type/model.converter';
+import { FollowEntity } from '../entities/follow.entity';
 
 @Injectable()
 export class FollowsService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(FollowEntity)
+    private followRepository: Repository<FollowEntity>,
     private dataSource: DataSource,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
@@ -32,7 +35,6 @@ export class FollowsService {
   ): Promise<FollowResponse> {
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
-      relations: ['Followings'],
     });
 
     if (!user) {
@@ -43,22 +45,22 @@ export class FollowsService {
     }
 
     // 팔로우 할 사람
-    const following = await this.userRepository.findOne({
+    const followUser = await this.userRepository.findOne({
       where: { id: followingId, deletedAt: null },
     });
 
-    if (!following) {
+    if (!followUser) {
       throw new BadRequestException({
         message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    // 이미 팔로우하고 있지 않은 경우에만 팔로우 걸기
-    if (!user.Followings.some((Following) => Following.id === following.id)) {
-      user.Followings.push(following);
-      await this.userRepository.save(user);
-    }
+    const follow = new FollowEntity();
+    follow.following = followUser;
+    follow.follower = user;
+
+    await this.followRepository.save(follow);
 
     return { success: true };
   }
@@ -85,28 +87,28 @@ export class FollowsService {
     }
 
     // 팔로우 할 사람
-    const following = await this.userRepository.findOne({
+    const followUser = await this.userRepository.findOne({
       where: { nickname: nickname, deletedAt: null },
     });
 
-    if (!following) {
+    if (!followUser) {
       throw new BadRequestException({
         message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    // 이미 팔로우하고 있지 않은 경우에만 팔로우 걸기
-    if (!user.Followings.some((Following) => Following.id === following.id)) {
-      user.Followings.push(following);
-      await this.userRepository.save(user);
-    }
+    const follow = new FollowEntity();
+    follow.following = followUser;
+    follow.follower = user;
+
+    await this.followRepository.save(follow);
 
     return { success: true };
   }
 
   /**
-   * 팔로앙 목록 가져오기
+   * 내가 팔로우 하는 유저들 정보 가져오가
    * @param userId
    */
   async getFollowings(userId: number): Promise<User[]> {
@@ -122,13 +124,13 @@ export class FollowsService {
       });
     }
 
-    return user.Followings.map((Following) => {
-      return ModelConverter.user(Following);
+    return user.Followings.map((following) => {
+      return ModelConverter.user(following);
     });
   }
 
   /**
-   * 팔로워 목록 가져오기
+   * 나를 팔로우 하는 유저들 정보 가져오기
    * @param userId
    */
   async getFollowers(userId: number): Promise<Follower[]> {
@@ -195,15 +197,10 @@ export class FollowsService {
       });
     }
 
-    // 팔로우 중인 경우에만 언팔로우를 수행.
-    const indexOfFollowing = user.Followings.findIndex(
-      (Following) => Following.id === following.id,
-    );
-
-    if (indexOfFollowing !== -1) {
-      following.Followers.splice(indexOfFollowing, 1);
-      await this.userRepository.save(user);
-    }
+    await this.followRepository.delete({
+      followerId: userId,
+      followingId: following.id,
+    });
 
     return { success: true };
   }
