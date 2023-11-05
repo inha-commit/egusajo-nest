@@ -23,6 +23,10 @@ export class UserEntity {
   @Column('varchar', { unique: true })
   snsId: string;
 
+  // 유저 이름
+  @Column('varchar')
+  name: string;
+
   // 유저 닉네임
   @Column('varchar', { length: 30, unique: true })
   nickname: string;
@@ -30,6 +34,14 @@ export class UserEntity {
   // 유저 생일
   @Column('varchar', { length: 8 })
   birthday: string;
+
+  // 유저 은행
+  @Column('varchar')
+  bank: string;
+
+  // 유저 계좌번호
+  @Column('varchar')
+  account: string;
 
   // 유저 이미지
   @Column('varchar')

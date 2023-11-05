@@ -110,14 +110,7 @@ export class PresentsController {
   async createPresent(@Req() request, @Body() data: CreatePresentRequestDto) {
     const response = await this.presentsService.createPresent(
       request.userId,
-      data.name,
-      data.productLink,
-      data.goal,
-      data.deadline,
-      data.presentImages,
-      data.representImage,
-      data.shortComment,
-      data.longComment,
+      data,
     );
 
     return new CreatePresentResponseDto(response);
@@ -369,14 +362,7 @@ export class PresentsController {
     const response = await this.presentsService.updatePresent(
       request.userId,
       presentId,
-      data.name,
-      data.productLink,
-      data.goal,
-      data.deadline,
-      data.presentImages,
-      data.representImage,
-      data.shortComment,
-      data.longComment,
+      data,
     );
 
     return new UpdatePresentResponseDto(response);
@@ -552,8 +538,7 @@ export class PresentsController {
     const response = await this.presentsService.createFunding(
       request.userId,
       parseInt(presentId),
-      data.cost,
-      data.comment,
+      data,
     );
 
     return new CreateFundingResponseDto(response);

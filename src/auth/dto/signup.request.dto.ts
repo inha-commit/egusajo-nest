@@ -9,6 +9,13 @@ export class SignupRequestDto {
   readonly snsId: string;
 
   @ApiProperty({
+    description: '사용자 실제 이름',
+  })
+  @IsString()
+  @MaxLength(30)
+  readonly name: string;
+
+  @ApiProperty({
     description: '중복확인 한 닉네임',
   })
   @IsString()
@@ -23,6 +30,18 @@ export class SignupRequestDto {
   @MinLength(8)
   @MaxLength(8)
   readonly birthday: string;
+
+  @ApiProperty({
+    description: '사용자 은행',
+  })
+  @IsString()
+  readonly bank: string;
+
+  @ApiProperty({
+    description: '사용자 계좌번호',
+  })
+  @IsString()
+  readonly account: string;
 
   @ApiProperty({
     description: 'fcm 고유 아이디',

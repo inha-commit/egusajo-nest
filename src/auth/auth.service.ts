@@ -12,6 +12,9 @@ import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
 import { SlackApiClient } from '../utils/slack.api.client';
+import { SignupRequestDto } from './dto/signup.request.dto';
+import { SigninRequestDto } from './dto/signin.request.dto';
+import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +28,11 @@ export class AuthService {
 
   /**
    * 로그인
-   * @param snsId
+   * @param data
    */
-  async signIn(snsId: string): Promise<Tokens> {
+  async signIn(data: SigninRequestDto): Promise<Tokens> {
+    const { snsId } = data;
+
     const user = await this.userRepository.findOne({
       where: { snsId: snsId, deletedAt: null },
     });
@@ -44,19 +49,19 @@ export class AuthService {
 
   /**
    * 회원가입
-   * @param snsId
-   * @param nickname
-   * @param birthday
-   * @param fcmId
-   * @param profileImageSrc
+   * @param data
    */
-  async signUp(
-    snsId: string,
-    nickname: string,
-    birthday: string,
-    fcmId: string,
-    profileImageSrc: string | null,
-  ): Promise<Tokens> {
+  async signUp(data: SignupRequestDto): Promise<Tokens> {
+    const {
+      snsId,
+      name,
+      nickname,
+      birthday,
+      bank,
+      account,
+      fcmId,
+      profileImageSrc,
+    } = data;
     // snsId로 유저 식별
     const snsIdExist = await this.userRepository.findOne({
       where: { snsId: snsId, deletedAt: null },
@@ -98,18 +103,17 @@ export class AuthService {
     await queryRunner.startTransaction();
 
     try {
-      // profileImage등록 안하면 기본 이미지로 설정
-      if (!profileImageSrc) {
-        profileImageSrc = 'basic.png';
-      }
-
-      // 유저 저장
+      // 유저 저장 (profileImage등록 안하면 기본 이미지로 설정
       const newUser = new UserEntity();
       newUser.snsId = snsId;
+      newUser.name = name;
       newUser.nickname = nickname;
+      newUser.bank = bank;
+      newUser.account = account;
       newUser.fcmId = fcmId;
       newUser.birthday = birthday;
-      newUser.profileImgSrc = profileImageSrc;
+      newUser.profileImgSrc =
+        profileImageSrc === null ? 'basic.png' : profileImageSrc;
       newUser.alarm = true;
 
       await queryRunner.manager.save(newUser);
@@ -130,11 +134,13 @@ export class AuthService {
 
   /**
    * 닉네임 중복 체크
-   * @param nickname
+   * @param data
    */
   async validateNickname(
-    nickname: string,
+    data: NicknameValidationRequestDto,
   ): Promise<NicknameValidationResponse> {
+    const { nickname } = data;
+
     if (this.checkSlang(nickname)) {
       throw new BadRequestException({
         message: '사용할 수 없는 단어가 포함되어 있습니다!',

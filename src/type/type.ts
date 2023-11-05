@@ -15,6 +15,7 @@ type NicknameValidationResponse = {
 // User
 type User = {
   id: number;
+  name: string;
   nickname: string;
   birthday: string;
   profileImgSrc: string;
@@ -29,6 +30,7 @@ type DeleteMyInfoResponse = {
 // Follow
 type Follower = {
   id: number;
+  name: string;
   nickname: string;
   birthday: string;
   profileImgSrc: string;

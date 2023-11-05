@@ -12,6 +12,7 @@ import { UserEntity } from '../entities/user.entity';
 import customErrorCode from '../type/custom.error.code';
 import { ModelConverter } from '../type/model.converter';
 import { DeleteMyInfoResponse, User } from '../type/type';
+import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
 
 @Injectable()
 export class UsersService {
@@ -44,20 +45,14 @@ export class UsersService {
   /**
    * 유저 정보 업데이트
    * @param userId
-   * @param nickname
-   * @param birthday
-   * @param profileImgSrc
-   * @param fcmId
-   * @param alarm
+   * @param data
    */
   async updateMyInfo(
     userId: number,
-    nickname: string,
-    birthday: string,
-    profileImgSrc: string,
-    fcmId: string,
-    alarm: boolean,
+    data: UpdateMyInfoRequestDto,
   ): Promise<User> {
+    const { name, nickname, birthday, profileImageSrc, fcmId, alarm } = data;
+
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -81,16 +76,13 @@ export class UsersService {
       });
     }
 
-    // profileImage등록 안하면 기본 이미지로 설정
-    if (!profileImgSrc) {
-      profileImgSrc = 'basic.png';
-    }
-
     // 유저 정보 수정
+    user.name = name;
     user.nickname = nickname;
     user.fcmId = fcmId;
     user.birthday = birthday;
-    user.profileImgSrc = profileImgSrc;
+    user.profileImgSrc =
+      profileImageSrc === null ? 'basic.png' : profileImageSrc;
     user.alarm = alarm;
 
     await this.userRepository.save(user);

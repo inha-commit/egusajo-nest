@@ -9,6 +9,13 @@ import {
 
 export class UpdateMyInfoRequestDto {
   @ApiProperty({
+    name: 'name',
+    description: '사용자 이름',
+  })
+  @MaxLength(30)
+  public name: string;
+
+  @ApiProperty({
     name: 'nickname',
     description: '사용자 닉네임',
   })
@@ -32,7 +39,7 @@ export class UpdateMyInfoRequestDto {
   })
   @IsOptional()
   @IsString()
-  public profileImgSrc: string | null;
+  public profileImageSrc: string | null;
 
   @ApiProperty({
     name: 'fcmId',

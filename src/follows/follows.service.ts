@@ -12,6 +12,7 @@ import { UserEntity } from '../entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ModelConverter } from '../type/model.converter';
 import { FollowEntity } from '../entities/follow.entity';
+import { FollowRequestDto } from './dto/follow.request.dto';
 
 @Injectable()
 export class FollowsService {
@@ -68,12 +69,14 @@ export class FollowsService {
   /**
    * 닉네임으로 팔로우 하기
    * @param userId
-   * @param nickname
+   * @param data
    */
   async followByNickname(
     userId: number,
-    nickname: string,
+    data: FollowRequestDto,
   ): Promise<FollowResponse> {
+    const { nickname } = data;
+
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
       relations: ['Followings'],

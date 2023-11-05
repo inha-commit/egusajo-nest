@@ -44,7 +44,7 @@ export class AuthController {
   })
   @Post('sign-in')
   async login(@Body() data: SigninRequestDto) {
-    const response = await this.authService.signIn(data.snsId);
+    const response = await this.authService.signIn(data);
 
     return new SigninResponseDto(response);
   }
@@ -86,13 +86,7 @@ export class AuthController {
   })
   @Post('sign-up')
   async signUp(@Body() data: SignupRequestDto) {
-    const response = await this.authService.signUp(
-      data.snsId,
-      data.nickname,
-      data.birthday,
-      data.fcmId,
-      data.profileImageSrc,
-    );
+    const response = await this.authService.signUp(data);
 
     return new SignupResponseDto(response);
   }
@@ -134,7 +128,7 @@ export class AuthController {
   })
   @Post('nickname-validation')
   async validateNickname(@Body() data: NicknameValidationRequestDto) {
-    const response = await this.authService.validateNickname(data.nickname);
+    const response = await this.authService.validateNickname(data);
 
     return new NicknameValidationResponseDto(response);
   }

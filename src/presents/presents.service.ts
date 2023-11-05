@@ -13,6 +13,9 @@ import {
 } from '../type/type';
 import { FundingEntity } from '../entities/funding.entity';
 import { ModelConverter } from '../type/model.converter';
+import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
+import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
+import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
 
 @Injectable()
 export class PresentsService {
@@ -27,29 +30,27 @@ export class PresentsService {
     private fundingRepository: Repository<FundingEntity>,
     private dataSource: DataSource,
   ) {}
+
   /**
    * 선물 게시물 생성하기
    * @param userId
-   * @param name
-   * @param productLink
-   * @param goal
-   * @param deadline
-   * @param presentImages
-   * @param representImage
-   * @param shortComment
-   * @param longComment
+   * @param data
    */
   async createPresent(
     userId: number,
-    name: string,
-    productLink: string,
-    goal: number,
-    deadline: string,
-    presentImages: string[],
-    representImage: string,
-    shortComment: string,
-    longComment: string,
+    data: CreatePresentRequestDto,
   ): Promise<CreatePresentResponse> {
+    const {
+      name,
+      productLink,
+      goal,
+      deadline,
+      presentImages,
+      representImage,
+      shortComment,
+      longComment,
+    } = data;
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -219,27 +220,24 @@ export class PresentsService {
    * 선물 게시물 수정하기
    * @param userId
    * @param presentId
-   * @param name
-   * @param productLink
-   * @param goal
-   * @param deadline
-   * @param presentImages
-   * @param representImage
-   * @param shortComment
-   * @param longComment
+   * @param data
    */
   async updatePresent(
     userId: number,
     presentId: number,
-    name: string,
-    productLink: string,
-    goal: number,
-    deadline: string,
-    presentImages: string[],
-    representImage: string,
-    shortComment: string,
-    longComment: string,
+    data: UpdatePresentRequestDto,
   ): Promise<UpdatePresentResponse> {
+    const {
+      name,
+      productLink,
+      goal,
+      deadline,
+      presentImages,
+      representImage,
+      shortComment,
+      longComment,
+    } = data;
+
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -380,9 +378,9 @@ export class PresentsService {
   async createFunding(
     userId: number,
     presentId: number,
-    cost: number,
-    comment: string,
+    data: CreateFundingRequestDto,
   ) {
+    const { cost, comment } = data;
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
     });

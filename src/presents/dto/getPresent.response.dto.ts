@@ -1,4 +1,3 @@
-import { IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 class User {
@@ -7,6 +6,12 @@ class User {
     description: '선물 게시글 작성자 Id',
   })
   id: number;
+
+  @ApiProperty({
+    name: 'name',
+    description: '선물 작성자 이름',
+  })
+  name: string;
 
   @ApiProperty({
     name: 'nickname',
@@ -22,6 +27,7 @@ class User {
 
   constructor(obj: User) {
     this.id = obj.id;
+    this.name = obj.name;
     this.nickname = obj.nickname;
     this.profileImgSrc = obj.profileImgSrc;
   }
@@ -131,6 +137,12 @@ class Sender {
   id: number;
 
   @ApiProperty({
+    name: 'name',
+    description: '펀딩한 유저 이름',
+  })
+  name: string;
+
+  @ApiProperty({
     name: 'nickname',
     description: '펀딩한 유저 닉네임',
   })
@@ -144,6 +156,7 @@ class Sender {
 
   constructor(obj: Sender) {
     this.id = obj.id;
+    this.name = obj.name;
     this.nickname = obj.nickname;
     this.profileImgSrc = obj.profileImgSrc;
   }

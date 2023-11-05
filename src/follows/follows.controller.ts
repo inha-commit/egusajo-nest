@@ -76,7 +76,7 @@ export class FollowsController {
   async followByNickname(@Req() request, @Body() data: FollowRequestDto) {
     const response = await this.followsService.followByNickname(
       request.userId,
-      data.nickname,
+      data,
     );
 
     return new FollowResponseDto(response);
