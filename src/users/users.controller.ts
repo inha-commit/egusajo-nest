@@ -101,14 +101,7 @@ export class UsersController {
   @Patch('me')
   @UseGuards(AccessTokenGuard)
   async updateMyInfo(@Req() request, @Body() data: UpdateMyInfoRequestDto) {
-    const response = await this.usersService.updateMyInfo(
-      request.userId,
-      data.nickname,
-      data.birthday,
-      data.profileImgSrc,
-      data.fcmId,
-      data.alarm,
-    );
+    const response = await this.usersService.updateMyInfo(request.userId, data);
     return new UpdateMyInfoResponseDto(response);
   }
 
@@ -144,9 +137,9 @@ export class UsersController {
     return new DeleteMyInfoResponseDto(response);
   }
 
-  @Patch('fcm')
+  @Patch('me/account')
   @UseGuards(AccessTokenGuard)
-  async updateFcmToken() {
+  async updateAccount() {
     // const response = await this.usersService.getMyInfo(data.snsId);
     // return new SigninResponseDto(response);
   }

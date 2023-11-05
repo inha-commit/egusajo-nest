@@ -2,6 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMyInfoResponseDto {
   @ApiProperty({
+    name: 'name',
+    description: '사용자 이름',
+  })
+  public name: string;
+
+  @ApiProperty({
     name: 'nickname',
     description: '사용자 닉네임',
   })
@@ -32,6 +38,7 @@ export class GetMyInfoResponseDto {
   public alarm: boolean;
 
   constructor(obj: GetMyInfoResponseDto) {
+    this.name = obj.name;
     this.nickname = obj.nickname;
     this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;

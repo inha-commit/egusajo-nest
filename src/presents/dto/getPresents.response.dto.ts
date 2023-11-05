@@ -8,6 +8,12 @@ class User {
   id: number;
 
   @ApiProperty({
+    name: 'name',
+    description: '선물 게시글 작성자 이름',
+  })
+  name: string;
+
+  @ApiProperty({
     name: 'nickname',
     description: '선물 게시글 작성자 닉네임',
   })
@@ -21,6 +27,7 @@ class User {
 
   constructor(obj: User) {
     this.id = obj.id;
+    this.name = obj.name;
     this.nickname = obj.nickname;
     this.profileImgSrc = obj.profileImgSrc;
   }

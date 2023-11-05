@@ -8,6 +8,12 @@ class GetFollowerResponseDto {
   public id: number;
 
   @ApiProperty({
+    name: 'name',
+    description: '사용자 이름',
+  })
+  public name: string;
+
+  @ApiProperty({
     name: 'nickname',
     description: '사용자 닉네임',
   })
@@ -33,6 +39,7 @@ class GetFollowerResponseDto {
 
   constructor(obj: GetFollowerResponseDto) {
     this.id = obj.id;
+    this.name = obj.name;
     this.nickname = obj.nickname;
     this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
@@ -47,6 +54,7 @@ export class GetFollowersResponseDto {
   constructor(obj: GetFollowerResponseDto[]) {
     this.followers = obj.map((item) => ({
       id: item.id,
+      name: item.name,
       nickname: item.nickname,
       birthday: item.birthday,
       profileImgSrc: item.profileImgSrc,
