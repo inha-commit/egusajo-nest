@@ -28,6 +28,7 @@ export class ImagesService {
         ACL: 'private',
         Key: key,
         Body: file.buffer,
+        ContentType: file.mimetype,
       };
 
       const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
