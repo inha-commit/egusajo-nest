@@ -91,11 +91,6 @@ export class UserEntity {
   @OneToMany(() => PresentEntity, (presents) => presents.User)
   Present: PresentEntity[];
 
-  // UserImageEntity와의 관계
-  // @OneToOne(() => UserImageEntity, (userImages) => userImages.User)
-  // @JoinColumn([{ name: 'UserImageId', referencedColumnName: 'id' }])
-  // UserImage: UserImageEntity;
-
   // FudingEntity와의 관계 - 펀딩한 사람
   @OneToMany(() => FundingEntity, (fundings) => fundings.Sender)
   Funding: FundingEntity[];

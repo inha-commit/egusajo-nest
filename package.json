@@ -19,6 +19,8 @@
     "db:drop:prod": "NODE_ENV=production ts-node ./node_modules/typeorm-extension/bin/cli.cjs db:drop -d ./dataSource.ts",
     "schema:drop:prod": "NODE_ENV=production ts-node ./node_modules/typeorm/cli.js schema:drop -d ./dataSource.ts",
     "schema:sync:prod": "NODE_ENV=production ts-node ./node_modules/typeorm/cli.js schema:sync -d ./dataSource.ts",
+    "seed:dev": "NODE_ENV=development ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d ./dataSource.ts",
+    "seed:prod": "NODE_ENV=production ts-node ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d ./dataSource.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

@@ -20,7 +20,7 @@ export class PresentEntity {
   id: number;
 
   // 생일선물 제품명
-  @Column('varchar', { length: 30 })
+  @Column('varchar', { length: 50 })
   name: string;
 
   // 생일 선물 제품 정보 링크
