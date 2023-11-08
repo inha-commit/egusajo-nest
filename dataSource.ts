@@ -5,7 +5,7 @@ import { PresentEntity } from './src/entities/present.entity';
 import { UserEntity } from './src/entities/user.entity';
 import { PresentImageEntity } from './src/entities/presentImage.entity';
 import { FollowEntity } from './src/entities/follow.entity';
-import UserSeeder from './src/database/seeds/user.seed';
+import UserSeeder from './src/database/seeds/seed';
 import { SeederOptions } from 'typeorm-extension';
 import UserFactory from './src/database/factories/user.factory';
 

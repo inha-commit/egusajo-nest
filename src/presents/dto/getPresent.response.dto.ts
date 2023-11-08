@@ -207,6 +207,9 @@ export class GetPresentResponseDto {
   readonly fundings: Fundings[];
 
   constructor(obj: GetPresentResponseDto) {
+    this.user = obj.user;
+    this.present = obj.present;
     this.presentImages = obj.presentImages;
+    this.fundings = obj.fundings;
   }
 }
