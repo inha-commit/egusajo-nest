@@ -1,10 +1,13 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import dotenv from 'dotenv';
 import { FundingEntity } from './src/entities/funding.entity';
 import { PresentEntity } from './src/entities/present.entity';
 import { UserEntity } from './src/entities/user.entity';
 import { PresentImageEntity } from './src/entities/presentImage.entity';
 import { FollowEntity } from './src/entities/follow.entity';
+import UserSeeder from './src/database/seeds/seed';
+import { SeederOptions } from 'typeorm-extension';
+import UserFactory from './src/database/factories/user.factory';
 
 dotenv.config({
   path: `${__dirname}/src/config/env/.${process.env.NODE_ENV}.env`,

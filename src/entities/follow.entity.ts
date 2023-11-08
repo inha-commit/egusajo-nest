@@ -27,6 +27,7 @@ export class FollowEntity {
   followingId: number;
 
   @ManyToOne(() => UserEntity, (user) => user.Follower, {
+    createForeignKeyConstraints: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
@@ -34,6 +35,7 @@ export class FollowEntity {
   follower: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.Following, {
+    createForeignKeyConstraints: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

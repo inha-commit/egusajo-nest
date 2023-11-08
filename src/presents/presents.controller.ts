@@ -232,6 +232,8 @@ export class PresentsController {
       parseInt(presentId),
     );
 
+    console.log(response);
+
     return new GetPresentResponseDto(response);
   }
 
