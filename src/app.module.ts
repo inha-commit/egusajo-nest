@@ -9,14 +9,14 @@ import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { validationSchema } from './config/validationSchema';
-import { TypeormConfigService } from './config/typeorm.config.service';
-
-import { CustomErrorFilter } from './type/custom.error.filter';
 import { FollowsModule } from './follows/follows.module';
 import { ImagesModule } from './images/images.module';
-import { SlackApiClient } from './utils/slack.api.client';
 import { PresentsModule } from './presents/presents.module';
+
+import { validationSchema } from './config/validationSchema';
+import { TypeormConfigService } from './config/typeorm.config.service';
+import { CustomErrorFilter } from './type/custom.error.filter';
+import { SlackApiClient } from './utils/slack.api.client';
 
 @Module({
   imports: [
