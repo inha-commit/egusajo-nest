@@ -27,10 +27,10 @@ export default class UserSeeder implements Seeder {
     // 100번 유저에 대해 모든 유저 팔로우하기
     const follows = [];
     await (async () => {
-      for (let i = 1; i < 100; i++) {
+      for (let i = 2; i < 100; i++) {
         const follow = await followFactory.make({
           followingId: i,
-          followerId: 100,
+          followerId: 1,
         });
         follows.push(follow);
       }
