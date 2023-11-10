@@ -53,5 +53,5 @@ export class SignupRequestDto {
   })
   @IsOptional()
   @IsString()
-  readonly profileImageSrc: string | null;
+  readonly profileImgSrc: string | null;
 }

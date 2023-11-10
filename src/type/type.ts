@@ -3,6 +3,10 @@ type AccessToken = {
   accessToken: string;
 };
 
+type RefreshToken = {
+  refreshToken: string;
+};
+
 type Tokens = {
   accessToken: string;
   refreshToken: string;
@@ -15,12 +19,26 @@ type NicknameValidationResponse = {
 // User
 type User = {
   id: number;
+  snsId: string;
   name: string;
   nickname: string;
   birthday: Date;
+  bank: string;
+  account: string;
   profileImgSrc: string;
   fcmId: string;
   alarm: boolean;
+};
+
+type UserDAO = {
+  snsId: string;
+  name: string;
+  nickname: string;
+  birthday: string;
+  bank: string;
+  account: string;
+  profileImgSrc: string;
+  fcmId: string;
 };
 
 type DeleteMyInfoResponse = {
@@ -89,6 +107,7 @@ export type {
   Tokens,
   NicknameValidationResponse,
   User,
+  UserDAO,
   DeleteMyInfoResponse,
   Follower,
   FollowResponse,

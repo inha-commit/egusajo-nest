@@ -1,17 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  LoggerService,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import customErrorCode from '../type/custom.error.code';
 import { ModelConverter } from '../type/model.converter';
-import { DeleteMyInfoResponse, User } from '../type/type';
+import { DeleteMyInfoResponse, User, UserDAO } from '../type/type';
 import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
 
 @Injectable()
@@ -19,18 +13,56 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private dataSource: DataSource,
-    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
+
+  async createUser(userDAO: UserDAO): Promise<User> {
+    const {
+      snsId,
+      name,
+      nickname,
+      birthday,
+      bank,
+      account,
+      fcmId,
+      profileImgSrc,
+    } = userDAO;
+
+    const newUser = new UserEntity();
+    newUser.snsId = snsId;
+    newUser.name = name;
+    newUser.nickname = nickname;
+    newUser.bank = bank;
+    newUser.account = account;
+    newUser.fcmId = fcmId;
+    newUser.birthday = birthday;
+    newUser.profileImgSrc =
+      profileImgSrc === null ? 'basic.png' : profileImgSrc;
+    newUser.alarm = true;
+
+    return await this.userRepository.save(newUser);
+  }
+
+  async findUser(
+    property: string,
+    value: string | number,
+  ): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { [property]: value, deletedAt: null },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return ModelConverter.user(user);
+  }
 
   /**
    * 내 정보 가져오기
    * @param userId
    */
   async getMyInfo(userId: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -39,7 +71,7 @@ export class UsersService {
       });
     }
 
-    return ModelConverter.user(user);
+    return user;
   }
 
   /**
