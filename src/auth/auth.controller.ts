@@ -43,7 +43,7 @@ export class AuthController {
     },
   })
   @Post('sign-in')
-  async login(@Body() data: SigninRequestDto) {
+  async signIn(@Body() data: SigninRequestDto) {
     const response = await this.authService.signIn(data);
 
     return new SigninResponseDto(response);
@@ -188,7 +188,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   async refreshToken(@Req() request) {
-    const response = await this.authService.refreshToken(request.userId);
+    const response = await this.authService.refresh(request.userId);
 
     return new RefreshResponseDto(response);
   }

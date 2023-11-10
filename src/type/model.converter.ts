@@ -8,10 +8,13 @@ export class ModelConverter {
   static user(user: UserEntity): User {
     return {
       id: user.id,
+      snsId: user.snsId,
       name: user.name,
       nickname: user.nickname,
       birthday: user.birthday,
       profileImgSrc: user.profileImgSrc,
+      bank: user.bank,
+      account: user.account,
       fcmId: user.fcmId,
       alarm: user.alarm,
     };

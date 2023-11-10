@@ -24,7 +24,7 @@ export class SignupRequestDto {
 
   @ApiProperty({
     description:
-      '생일 (YYYYMMDD 형식으로 보내주세요) 때문에 항상 5글자여야합니다.',
+      '생일 (YYYYMMDD 형식으로 보내주세요) 때문에 항상 8글자여야합니다.',
   })
   @IsString()
   @MinLength(8)
@@ -55,5 +55,5 @@ export class SignupRequestDto {
   })
   @IsOptional()
   @IsString()
-  readonly profileImageSrc: string | null;
+  readonly profileImgSrc: string | null;
 }

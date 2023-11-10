@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './config/winston.config';
 import { ValidationPipe } from '@nestjs/common';
-import { ApiTimeInterceptor } from './intercepter/api.time.interceptor';
+import { ApiTimeInterceptor } from './interceptor/api.time.interceptor';
 import { swaggerConfig } from './config/swagger.config';
 
 async function bootstrap() {
