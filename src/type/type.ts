@@ -30,7 +30,7 @@ type User = {
   alarm: boolean;
 };
 
-type UserDAO = {
+type CreateUserDAO = {
   snsId: string;
   name: string;
   nickname: string;
@@ -39,6 +39,16 @@ type UserDAO = {
   account: string;
   profileImgSrc: string;
   fcmId: string;
+};
+
+type UpdateUserDAO = {
+  name: string;
+  nickname: string;
+  birthday: string;
+  bank: string;
+  account: string;
+  profileImgSrc: string;
+  alarm: boolean;
 };
 
 type DeleteMyInfoResponse = {
@@ -107,7 +117,8 @@ export type {
   Tokens,
   NicknameValidationResponse,
   User,
-  UserDAO,
+  CreateUserDAO,
+  UpdateUserDAO,
   DeleteMyInfoResponse,
   Follower,
   FollowResponse,
