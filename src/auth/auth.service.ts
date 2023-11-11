@@ -144,14 +144,12 @@ export class AuthService {
    * @param userId
    */
   createAccessToken(userId: number): string {
-    const accessToken = this.jwtService.sign(
+    return this.jwtService.sign(
       { userId: `${userId}` },
       {
         expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE}`,
       },
     );
-
-    return accessToken;
   }
 
   /**
@@ -159,11 +157,9 @@ export class AuthService {
    * @param userId
    */
   createRefreshToken(userId: number): string {
-    const refreshToken = this.jwtService.sign(
+    return this.jwtService.sign(
       { userId: `${userId}` },
       { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRE}` },
     );
-
-    return refreshToken;
   }
 }
