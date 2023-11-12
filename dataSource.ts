@@ -27,5 +27,5 @@ export const AppDataSource = new DataSource({
     PresentImageEntity,
     FollowEntity,
   ],
-  synchronize: true,
+  synchronize: false,
 });
