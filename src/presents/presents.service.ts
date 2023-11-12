@@ -16,6 +16,7 @@ import { ModelConverter } from '../type/model.converter';
 import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
 import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PresentsService {
@@ -28,6 +29,7 @@ export class PresentsService {
     private presentImageRepository: Repository<PresentImageEntity>,
     @InjectRepository(FundingEntity)
     private fundingRepository: Repository<FundingEntity>,
+    private usersService: UsersService,
     private dataSource: DataSource,
   ) {}
 
@@ -55,9 +57,7 @@ export class PresentsService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -170,9 +170,7 @@ export class PresentsService {
    * @param presentId
    */
   async getPresent(userId: number, presentId: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -338,9 +336,7 @@ export class PresentsService {
     userId: number,
     presentId: number,
   ): Promise<DeletePresentResponse> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({

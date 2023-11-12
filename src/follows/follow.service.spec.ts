@@ -94,10 +94,6 @@ class MockUserRepository {
     },
   ];
 
-  save() {
-    return this.#data[0];
-  }
-
   findOne(parameter) {
     const keys = Object.keys(parameter.where);
     const property = keys[0];
@@ -111,10 +107,6 @@ class MockUserRepository {
       return data;
     }
     return null;
-  }
-
-  softDelete() {
-    return true;
   }
 }
 
