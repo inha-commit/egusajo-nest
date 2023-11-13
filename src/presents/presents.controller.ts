@@ -43,8 +43,8 @@ export class PresentsController {
     description: 'CreatePresentRequestDto | CreatePresentResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: CreatePresentResponseDto,
@@ -121,8 +121,8 @@ export class PresentsController {
     description: 'GetPresentsResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiQuery({ name: 'page', type: Number, description: '페이지' })
   @ApiOkResponse({
@@ -164,8 +164,8 @@ export class PresentsController {
     description: 'GetPresentResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiParam({
     name: 'presentId',
@@ -240,6 +240,10 @@ export class PresentsController {
   @ApiOperation({
     summary: '특정 선물 게시물 수정하기',
     description: 'UpdatePresentRequestDto | UpdatePresentResponseDto',
+  })
+  @ApiHeader({
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiParam({
     name: 'presentId',
@@ -374,6 +378,10 @@ export class PresentsController {
     summary: '특정 선물 게시물 삭제하기',
     description: 'DeletePresentResponseDto',
   })
+  @ApiHeader({
+    name: 'accessToken',
+    description: '발급된 accessToken',
+  })
   @ApiOkResponse({
     type: DeletePresentResponseDto,
   })
@@ -456,8 +464,8 @@ export class PresentsController {
     description: 'CreateFundingRequestDto | CreateFundingResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiParam({
     name: 'presentId',
