@@ -137,21 +137,22 @@ export class AuthController {
     summary: '토큰 refresh',
   })
   @ApiHeader({
-    name: 'refreshToken',
-    description: '발급된 refreshToken',
+    name: 'refresh-token',
+    description: '발급된 refresh-token',
+    required: true,
   })
   @ApiOkResponse({
     type: RefreshResponseDto,
   })
   @ApiResponse({
     status: 2100,
-    description: '헤더에 refresh_token이 들어가 있지 않은 경우',
+    description: '헤더에 refresh-token이 들어가 있지 않은 경우',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '헤더에 refresh_token이 존재하지 않습니다!',
+          description: '헤더에 refresh-token이 존재하지 않습니다!',
           code: 2100,
         },
       },
@@ -165,7 +166,7 @@ export class AuthController {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '만료된 refresh_token 입니다!',
+          description: '만료된 refresh-token 입니다!',
           code: 2101,
         },
       },
@@ -173,13 +174,13 @@ export class AuthController {
   })
   @ApiResponse({
     status: 2102,
-    description: '잘못된 refreshToken',
+    description: '잘못된 refresh-token',
     content: {
       'application/json': {
         example: {
           statusCode: 400,
           message: 'BAD REQUEST ERROR',
-          description: '잘못된 refresh_token 입니다!',
+          description: '잘못된 refresh-token 입니다!',
           code: 2102,
         },
       },

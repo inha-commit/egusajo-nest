@@ -43,8 +43,9 @@ export class PresentsController {
     description: 'CreatePresentRequestDto | CreatePresentResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiOkResponse({
     type: CreatePresentResponseDto,
@@ -121,8 +122,9 @@ export class PresentsController {
     description: 'GetPresentsResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiQuery({ name: 'page', type: Number, description: '페이지' })
   @ApiOkResponse({
@@ -164,8 +166,9 @@ export class PresentsController {
     description: 'GetPresentResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiParam({
     name: 'presentId',
@@ -242,8 +245,9 @@ export class PresentsController {
     description: 'UpdatePresentRequestDto | UpdatePresentResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiParam({
     name: 'presentId',
@@ -379,8 +383,9 @@ export class PresentsController {
     description: 'DeletePresentResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiOkResponse({
     type: DeletePresentResponseDto,
@@ -464,8 +469,9 @@ export class PresentsController {
     description: 'CreateFundingRequestDto | CreateFundingResponseDto',
   })
   @ApiHeader({
-    name: 'accessToken',
-    description: '발급된 accessToken',
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
   })
   @ApiParam({
     name: 'presentId',
