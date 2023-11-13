@@ -13,7 +13,7 @@ export class RefreshTokenGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.refreshToken;
+    const token = request.headers['refresh-token'];
 
     if (!token) {
       throw new BadRequestException({

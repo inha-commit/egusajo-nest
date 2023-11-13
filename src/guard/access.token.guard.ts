@@ -13,7 +13,8 @@ export class AccessTokenGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.accessToken;
+
+    const token = request.headers['access-token'];
 
     if (!token) {
       throw new BadRequestException({
