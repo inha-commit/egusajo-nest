@@ -3,7 +3,7 @@ import { Follower, FollowResponse, UnFollowResponse, User } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ModelConverter } from '../type/model.converter';
 import { FollowEntity } from '../entities/follow.entity';
 import { FollowRequestDto } from './dto/follow.request.dto';

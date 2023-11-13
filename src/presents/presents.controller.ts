@@ -109,7 +109,7 @@ export class PresentsController {
   @UseGuards(AccessTokenGuard)
   @Post('/')
   async createPresent(@Req() request, @Body() data: CreatePresentRequestDto) {
-    const response = await this.presentsService.createPresent(
+    const response = await this.presentsService.createPresentPost(
       request.userId,
       data,
     );

@@ -89,6 +89,17 @@ type Present = {
   longComment: string;
 };
 
+type CreatePresentDAO = {
+  name: string;
+  productLink: string;
+  goal: number;
+  deadline: string;
+  presentImages: string[];
+  representImage: string;
+  shortComment: string;
+  longComment: string;
+};
+
 type PresentWithUser = {
   user: User;
   present: Present;
@@ -125,6 +136,7 @@ export type {
   UnFollowResponse,
   Present,
   PresentWithUser,
+  CreatePresentDAO,
   CreatePresentResponse,
   UpdatePresentResponse,
   DeletePresentResponse,
