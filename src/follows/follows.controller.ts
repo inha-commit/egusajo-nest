@@ -37,8 +37,8 @@ export class FollowsController {
     description: 'FollowRequestDto | FollowResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: FollowResponseDto,
@@ -87,8 +87,8 @@ export class FollowsController {
     description: 'FollowRequestDto | FollowResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiParam({
     name: 'userId',
@@ -150,8 +150,8 @@ export class FollowsController {
     description: 'GetFollowingsResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: GetFollowingsResponseDto,
@@ -183,8 +183,8 @@ export class FollowsController {
     description: 'GetFollowersResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: GetFollowersResponseDto,
@@ -216,8 +216,8 @@ export class FollowsController {
     description: 'UnfollowResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiParam({
     name: 'userId',

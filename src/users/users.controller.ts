@@ -32,8 +32,8 @@ export class UsersController {
     description: 'GetMyInfoResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: GetMyInfoResponseDto,
@@ -64,8 +64,8 @@ export class UsersController {
     description: 'UpdateMyInfoRequestDto | UpdateMyInfoResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: UpdateMyInfoResponseDto,
@@ -110,8 +110,8 @@ export class UsersController {
     description: 'DeleteMyInfoResponseDto',
   })
   @ApiHeader({
-    name: 'access_token',
-    description: '발급된 access token',
+    name: 'accessToken',
+    description: '발급된 accessToken',
   })
   @ApiOkResponse({
     type: DeleteMyInfoResponseDto,

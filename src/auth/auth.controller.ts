@@ -137,8 +137,8 @@ export class AuthController {
     summary: '토큰 refresh',
   })
   @ApiHeader({
-    name: 'refresh_token',
-    description: '발급된 refresh token',
+    name: 'refreshToken',
+    description: '발급된 refreshToken',
   })
   @ApiOkResponse({
     type: RefreshResponseDto,
@@ -159,7 +159,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 2101,
-    description: '만료된 refresh_token',
+    description: '만료된 refreshToken',
     content: {
       'application/json': {
         example: {
@@ -173,7 +173,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 2102,
-    description: '잘못된 refresh_token',
+    description: '잘못된 refreshToken',
     content: {
       'application/json': {
         example: {
