@@ -41,14 +41,14 @@ class Present {
   id: number;
 
   @ApiProperty({
-    name: 'nickname',
+    name: 'name',
     description: '선물 이름',
   })
   name: string;
 
   @ApiProperty({
-    name: 'profileImgSrc',
-    description: '선물 대표이미지',
+    name: 'productLink',
+    description: '선물 링크',
   })
   productLink: string;
 
@@ -69,13 +69,19 @@ class Present {
     description: '현재까지 펀딩 금액',
   })
   money: number;
+  // @ApiProperty({
+  //   name: 'deadline',
+  //   description: '펀딩 종료 날짜',
+  //   example: 'D-1',
+  // })
+  // deadline: Date | string;
 
   @ApiProperty({
     name: 'deadline',
     description: '펀딩 종료 날짜',
-    example: '2023-09-14',
+    example: 'D-1',
   })
-  deadline: Date;
+  deadline: string | Date;
 
   @ApiProperty({
     name: 'shortComment',
@@ -96,13 +102,27 @@ class Present {
   longComment: string;
 
   constructor(obj: Present) {
+    const today = new Date();
+    const deadlineDate = new Date(obj.deadline);
+
+    const timeDiff = deadlineDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
     this.id = obj.id;
     this.name = obj.name;
     this.productLink = obj.productLink;
     this.complete = obj.complete;
     this.goal = obj.goal;
+    if (daysDiff > 1) {
+      this.deadline = `D-${daysDiff}`;
+    } else if (daysDiff === 1) {
+      this.deadline = 'D-1';
+    } else if (daysDiff < 1 && daysDiff >= 0) {
+      this.deadline = 'D-day';
+    } else {
+      this.deadline = 'END';
+    }
     this.money = obj.money;
-    this.deadline = obj.deadline;
     this.representImage = obj.representImage;
     this.shortComment = obj.shortComment;
     this.longComment = obj.longComment;
@@ -123,6 +143,11 @@ class PresentWithUser {
     description: '선물 게시글',
   })
   readonly present: Present;
+
+  constructor(obj: PresentWithUser) {
+    this.user = new User(obj.user);
+    this.present = new Present(obj.present);
+  }
 }
 
 export class GetPresentsResponseDto {
@@ -130,9 +155,12 @@ export class GetPresentsResponseDto {
   public presents: PresentWithUser[];
 
   constructor(obj: PresentWithUser[]) {
-    this.presents = obj.map((item) => ({
-      user: item.user,
-      present: item.present,
-    }));
+    this.presents = obj.map(
+      (item) =>
+        new PresentWithUser({
+          user: item.user,
+          present: item.present,
+        }),
+    );
   }
 }

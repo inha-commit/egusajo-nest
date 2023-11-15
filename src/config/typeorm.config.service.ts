@@ -27,7 +27,7 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
         FollowEntity,
       ],
       synchronize: false,
-      logging: true,
+      logging: false,
     };
   }
 }
