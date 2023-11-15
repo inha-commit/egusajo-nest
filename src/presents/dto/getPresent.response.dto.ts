@@ -127,6 +127,12 @@ class Funding {
     description: '펀딩 한마디',
   })
   comment: string;
+
+  constructor(obj: Funding) {
+    this.id = obj.id;
+    this.cost = obj.cost;
+    this.comment = obj.comment;
+  }
 }
 
 class Sender {
@@ -162,7 +168,7 @@ class Sender {
   }
 }
 
-class Fundings {
+class FundingWithUser {
   @ApiProperty({
     name: 'funding',
     type: Funding,
@@ -176,6 +182,11 @@ class Fundings {
     description: '펀딩한 유저 정보',
   })
   readonly user: Sender;
+
+  constructor(obj: FundingWithUser) {
+    this.funding = new Funding(obj.funding);
+    this.user = new Sender(obj.user);
+  }
 }
 
 export class GetPresentResponseDto {
@@ -201,15 +212,15 @@ export class GetPresentResponseDto {
 
   @ApiProperty({
     name: 'fundings',
-    type: [Fundings],
+    type: [FundingWithUser],
     description: '펀딩들',
   })
-  readonly fundings: Fundings[];
+  readonly fundings: FundingWithUser[];
 
   constructor(obj: GetPresentResponseDto) {
-    this.user = obj.user;
-    this.present = obj.present;
+    this.user = new User(obj.user);
+    this.present = new Present(obj.present);
     this.presentImages = obj.presentImages;
-    this.fundings = obj.fundings;
+    this.fundings = obj.fundings.map((funding) => new FundingWithUser(funding));
   }
 }

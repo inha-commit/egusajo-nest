@@ -144,11 +144,15 @@ export class PresentsService {
       }
     });
 
+    if (followingIds.length === 0) {
+      return [];
+    }
+
     const presents = await this.dataSource
       .createQueryBuilder(PresentEntity, 'present')
       .innerJoinAndSelect('present.User', 'user')
       .where('present.UserId IN (:...followingIds)', {
-        followingIds: followingIds,
+        followingIds: [...followingIds],
       })
       .andWhere('present.deletedAt IS NULL')
       .orderBy('present.createdAt', 'DESC')

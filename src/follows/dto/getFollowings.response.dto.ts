@@ -45,12 +45,15 @@ export class GetFollowingsResponseDto {
   public followings: GetFollowingResponseDto[];
 
   constructor(obj: GetFollowingResponseDto[]) {
-    this.followings = obj.map((item) => ({
-      id: item.id,
-      name: item.name,
-      nickname: item.nickname,
-      birthday: item.birthday,
-      profileImgSrc: item.profileImgSrc,
-    }));
+    this.followings = obj.map(
+      (item) =>
+        new GetFollowingResponseDto({
+          id: item.id,
+          name: item.name,
+          nickname: item.nickname,
+          birthday: item.birthday,
+          profileImgSrc: item.profileImgSrc,
+        }),
+    );
   }
 }

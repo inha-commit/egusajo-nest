@@ -52,13 +52,16 @@ export class GetFollowersResponseDto {
   public followers: GetFollowerResponseDto[];
 
   constructor(obj: GetFollowerResponseDto[]) {
-    this.followers = obj.map((item) => ({
-      id: item.id,
-      name: item.name,
-      nickname: item.nickname,
-      birthday: item.birthday,
-      profileImgSrc: item.profileImgSrc,
-      isFollowing: item.isFollowing,
-    }));
+    this.followers = obj.map(
+      (item) =>
+        new GetFollowerResponseDto({
+          id: item.id,
+          name: item.name,
+          nickname: item.nickname,
+          birthday: item.birthday,
+          profileImgSrc: item.profileImgSrc,
+          isFollowing: item.isFollowing,
+        }),
+    );
   }
 }

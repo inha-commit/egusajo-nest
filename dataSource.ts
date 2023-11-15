@@ -28,4 +28,5 @@ export const AppDataSource = new DataSource({
     FollowEntity,
   ],
   synchronize: false,
+  logging: false,
 });
