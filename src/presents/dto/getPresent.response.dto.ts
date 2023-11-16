@@ -73,9 +73,9 @@ class Present {
   @ApiProperty({
     name: 'deadline',
     description: '펀딩 종료 날짜',
-    example: '2023-09-14',
+    example: 'D-1',
   })
-  deadline: Date;
+  deadline: string | Date;
 
   @ApiProperty({
     name: 'shortComment',
@@ -96,13 +96,27 @@ class Present {
   longComment: string;
 
   constructor(obj: Present) {
+    const today = new Date();
+    const deadlineDate = new Date(obj.deadline);
+
+    const timeDiff = deadlineDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
     this.id = obj.id;
     this.name = obj.name;
     this.productLink = obj.productLink;
     this.complete = obj.complete;
     this.goal = obj.goal;
+    if (daysDiff > 1) {
+      this.deadline = `D-${daysDiff}`;
+    } else if (daysDiff === 1) {
+      this.deadline = 'D-1';
+    } else if (daysDiff < 1 && daysDiff >= 0) {
+      this.deadline = 'D-day';
+    } else {
+      this.deadline = 'END';
+    }
     this.money = obj.money;
-    this.deadline = obj.deadline;
     this.representImage = obj.representImage;
     this.shortComment = obj.shortComment;
     this.longComment = obj.longComment;
@@ -177,7 +191,7 @@ class FundingWithUser {
   readonly funding: Funding;
 
   @ApiProperty({
-    name: 'user',
+    name: 'sender',
     type: Sender,
     description: '펀딩한 유저 정보',
   })
@@ -206,6 +220,7 @@ export class GetPresentResponseDto {
 
   @ApiProperty({
     name: 'presentImages',
+    type: [String],
     description: '선물 이미지들',
   })
   readonly presentImages: string[];
