@@ -69,12 +69,6 @@ class Present {
     description: '현재까지 펀딩 금액',
   })
   money: number;
-  // @ApiProperty({
-  //   name: 'deadline',
-  //   description: '펀딩 종료 날짜',
-  //   example: 'D-1',
-  // })
-  // deadline: Date | string;
 
   @ApiProperty({
     name: 'deadline',
