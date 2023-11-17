@@ -1,5 +1,6 @@
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class SignupRequestDto {
   @ApiProperty({
@@ -23,13 +24,13 @@ export class SignupRequestDto {
   readonly nickname: string;
 
   @ApiProperty({
-    description:
-      '생일 (YYYYMMDD 형식으로 보내주세요) 때문에 항상 5글자여야합니다.',
+    description: 'YYYY/MM/DD 형식으로 보내주세요',
   })
   @IsString()
   @MinLength(8)
   @MaxLength(8)
-  readonly birthday: string;
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
+  readonly birthday: Date;
 
   @ApiProperty({
     description: '사용자 은행',

@@ -32,8 +32,8 @@ export class UserEntity {
   nickname: string;
 
   // 유저 생일
-  @Column('varchar', { length: 8 })
-  birthday: string;
+  @Column('date')
+  birthday: Date;
 
   // 유저 은행
   @Column('varchar')
