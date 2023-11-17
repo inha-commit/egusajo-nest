@@ -57,6 +57,7 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   async getMyInfo(@Req() request) {
     const response = await this.usersService.getMyInfo(request.userId);
+
     return new GetMyInfoResponseDto(response);
   }
 

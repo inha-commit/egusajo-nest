@@ -17,7 +17,7 @@ type User = {
   id: number;
   name: string;
   nickname: string;
-  birthday: string;
+  birthday: Date;
   profileImgSrc: string;
   fcmId: string;
   alarm: boolean;
@@ -32,7 +32,7 @@ type Follower = {
   id: number;
   name: string;
   nickname: string;
-  birthday: string;
+  birthday: Date;
   profileImgSrc: string;
   fcmId: string;
   alarm: boolean;
