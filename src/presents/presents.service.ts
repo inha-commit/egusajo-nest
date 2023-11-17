@@ -66,8 +66,6 @@ export class PresentsService {
       });
     }
 
-    const deadlineDate = this.stringToDate(deadline);
-
     if (goal <= 0) {
       throw new BadRequestException({
         message: '목표 금액은 0원보다 높아야 합니다!',
@@ -75,7 +73,7 @@ export class PresentsService {
       });
     }
 
-    if (deadlineDate < new Date()) {
+    if (deadline < new Date()) {
       throw new BadRequestException({
         message: '기한은 오늘보다 늦어야 합니다!',
         code: customErrorCode.PRESENT_DEADLINE_SHORT_FALL,
@@ -93,7 +91,7 @@ export class PresentsService {
           complete: false,
           goal: goal,
           money: 0,
-          deadline: deadlineDate,
+          deadline: deadline,
           representImage: representImage,
           shortComment: shortComment,
           longComment: longComment,
@@ -272,8 +270,6 @@ export class PresentsService {
       });
     }
 
-    const deadlineDate = this.stringToDate(deadline);
-
     if (goal <= 0) {
       throw new BadRequestException({
         message: '목표 금액은 0원보다 높아야 합니다!',
@@ -281,7 +277,7 @@ export class PresentsService {
       });
     }
 
-    if (deadlineDate < new Date()) {
+    if (deadline < new Date()) {
       throw new BadRequestException({
         message: '기한은 오늘보다 늦어야 합니다!',
         code: customErrorCode.PRESENT_DEADLINE_SHORT_FALL,
@@ -305,7 +301,7 @@ export class PresentsService {
       present.name = name;
       present.productLink = productLink;
       present.goal = goal;
-      present.deadline = this.stringToDate(deadline);
+      present.deadline = deadline;
       present.representImage = representImage;
       present.shortComment = shortComment;
       present.longComment = longComment;

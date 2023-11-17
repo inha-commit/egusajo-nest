@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateMyInfoRequestDto {
   @ApiProperty({
@@ -24,13 +25,13 @@ export class UpdateMyInfoRequestDto {
 
   @ApiProperty({
     name: 'birthday',
-    description:
-      '생일 (YYYYMMDD 형식으로 보내주세요) 때문에 항상 5글자여야합니다.',
+    description: 'YYYY/MM/DD 형식으로 보내주세요',
   })
   @IsString()
   @MinLength(8)
   @MaxLength(8)
-  public birthday: string;
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
+  public birthday: Date;
 
   @ApiProperty({
     name: 'profileImgSsrc',

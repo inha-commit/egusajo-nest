@@ -5,7 +5,7 @@ function getRandomDate() {
   const year = Math.floor(Math.random() * (2023 - 1900) + 1900); // 1900년부터 2022년까지 무작위 연도 생성
   const month = String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0'); // 1부터 12까지 무작위 월 생성
   const day = String(Math.floor(Math.random() * 31 + 1)).padStart(2, '0'); // 1부터 31까지 무작위 일 생성
-  return `${year}${month}${day}`;
+  return new Date(`${year}/${month}/${day}`);
 }
 
 export default setSeederFactory(UserEntity, (faker) => {

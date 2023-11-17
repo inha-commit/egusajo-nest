@@ -9,6 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class UpdatePresentRequestDto {
   @ApiProperty({
@@ -31,12 +32,10 @@ export class UpdatePresentRequestDto {
   readonly goal: number;
 
   @ApiProperty({
-    description: '목표 날짜 YYYYMMDD 형식으로 보내주세요',
+    description: '목표 날짜 YYYY/MM/DD 형식으로 보내주세요',
   })
-  @IsString()
-  @MinLength(8)
-  @MaxLength(8)
-  readonly deadline: string;
+  @Transform(({ value }) => new Date(value), { toClassOnly: true })
+  readonly deadline: Date;
 
   @ApiProperty({
     description:

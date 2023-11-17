@@ -11,7 +11,7 @@ export class UpdateMyInfoResponseDto {
     name: 'birthday',
     description: '사용자 생일',
   })
-  public birthday: string;
+  public birthday: string | Date;
 
   @ApiProperty({
     name: 'profileImgSsrc',
@@ -32,8 +32,19 @@ export class UpdateMyInfoResponseDto {
   public alarm: boolean;
 
   constructor(obj: UpdateMyInfoResponseDto) {
+    if (typeof obj.birthday === 'string') {
+      this.birthday = obj.birthday.replace(
+        /(\d{4})-(\d{2})-(\d{2})/,
+        '$1/$2/$3',
+      );
+    } else {
+      const year = obj.birthday.getFullYear();
+      const month = String(obj.birthday.getMonth() + 1).padStart(2, '0');
+      const day = String(obj.birthday.getDate()).padStart(2, '0');
+      this.birthday = `${year}/${month}/${day}`;
+    }
+
     this.nickname = obj.nickname;
-    this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
     this.fcmId = obj.fcmId;
     this.alarm = obj.alarm;

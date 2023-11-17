@@ -23,7 +23,7 @@ class GetFollowingResponseDto {
     name: 'birthday',
     description: '사용자 생일',
   })
-  public birthday: string;
+  public birthday: string | Date;
 
   @ApiProperty({
     name: 'profileImgSrc',
@@ -32,10 +32,21 @@ class GetFollowingResponseDto {
   public profileImgSrc: string;
 
   constructor(obj: GetFollowingResponseDto) {
+    if (typeof obj.birthday === 'string') {
+      this.birthday = obj.birthday.replace(
+        /(\d{4})-(\d{2})-(\d{2})/,
+        '$1/$2/$3',
+      );
+    } else {
+      const year = obj.birthday.getFullYear();
+      const month = String(obj.birthday.getMonth() + 1).padStart(2, '0');
+      const day = String(obj.birthday.getDate()).padStart(2, '0');
+      this.birthday = `${year}/${month}/${day}`;
+    }
+
     this.id = obj.id;
     this.name = obj.name;
     this.nickname = obj.nickname;
-    this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
   }
 }
