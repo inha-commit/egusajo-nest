@@ -5,10 +5,11 @@ import { JwtService } from '@nestjs/jwt';
 import { FollowsController } from './follows.controller';
 import { FollowsService } from './follows.service';
 import { FollowEntity } from '../entities/follow.entity';
+import { UsersService } from '../users/users.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, FollowEntity])],
   controllers: [FollowsController],
-  providers: [FollowsService, JwtService, Logger],
+  providers: [FollowsService, UsersService, JwtService, Logger],
 })
 export class FollowsModule {}

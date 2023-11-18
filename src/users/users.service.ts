@@ -1,17 +1,16 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  LoggerService,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import customErrorCode from '../type/custom.error.code';
 import { ModelConverter } from '../type/model.converter';
-import { DeleteMyInfoResponse, User } from '../type/type';
+import {
+  DeleteMyInfoResponse,
+  User,
+  CreateUserDAO,
+  UpdateUserDAO,
+} from '../type/type';
 import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
 
 @Injectable()
@@ -19,18 +18,91 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private dataSource: DataSource,
-    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
+
+  /**
+   * 유저 생성
+   * @param createUserDAO
+   */
+  async createUser(createUserDAO: CreateUserDAO): Promise<User> {
+    const {
+      snsId,
+      name,
+      nickname,
+      birthday,
+      bank,
+      account,
+      fcmId,
+      profileImgSrc,
+    } = createUserDAO;
+
+    const newUser = new UserEntity();
+    newUser.snsId = snsId;
+    newUser.name = name;
+    newUser.nickname = nickname;
+    newUser.bank = bank;
+    newUser.account = account;
+    newUser.fcmId = fcmId;
+    newUser.birthday = birthday;
+    newUser.profileImgSrc =
+      profileImgSrc === null ? 'basic.png' : profileImgSrc;
+    newUser.alarm = true;
+
+    return await this.userRepository.save(newUser);
+  }
+
+  /**
+   * 유저 조회
+   * @param property
+   * @param value
+   */
+  async findUser(
+    property: string,
+    value: string | number,
+  ): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({
+      where: { [property]: value, deletedAt: null },
+    });
+  }
+
+  /**
+   * 유저 업데이트
+   * @param user
+   * @param updateUserDAO
+   */
+  async updateUser(
+    user: UserEntity,
+    updateUserDAO: UpdateUserDAO,
+  ): Promise<UserEntity> {
+    const { name, nickname, birthday, bank, account, profileImgSrc, alarm } =
+      updateUserDAO;
+
+    user.name = name;
+    user.nickname = nickname;
+    user.birthday = birthday;
+    user.bank = bank;
+    user.account = account;
+    user.profileImgSrc = profileImgSrc === null ? 'basic.png' : profileImgSrc;
+    user.alarm = alarm;
+
+    return await this.userRepository.save(user);
+  }
+
+  /**
+   * 유저 삭제
+   * @param property
+   * @param value
+   */
+  async deleteUser(property: string, value: string | number): Promise<void> {
+    await this.userRepository.softDelete({ [property]: value });
+  }
 
   /**
    * 내 정보 가져오기
    * @param userId
    */
   async getMyInfo(userId: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -51,11 +123,9 @@ export class UsersService {
     userId: number,
     data: UpdateMyInfoRequestDto,
   ): Promise<User> {
-    const { name, nickname, birthday, profileImageSrc, fcmId, alarm } = data;
+    const { nickname } = data;
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -65,9 +135,7 @@ export class UsersService {
     }
 
     // validation이 있지만 닉네임 중복 다시 체크
-    const nicknameCheck = await this.userRepository.findOne({
-      where: { nickname: nickname, deletedAt: null },
-    });
+    const nicknameCheck = await this.findUser('nickname', nickname);
 
     if (nicknameCheck) {
       throw new BadRequestException({
@@ -76,18 +144,9 @@ export class UsersService {
       });
     }
 
-    // 유저 정보 수정
-    user.name = name;
-    user.nickname = nickname;
-    user.fcmId = fcmId;
-    user.birthday = birthday;
-    user.profileImgSrc =
-      profileImageSrc === null ? 'basic.png' : profileImageSrc;
-    user.alarm = alarm;
+    const updatedUser = await this.updateUser(user, data);
 
-    await this.userRepository.save(user);
-
-    return ModelConverter.user(user);
+    return ModelConverter.user(updatedUser);
   }
 
   /**
@@ -95,9 +154,7 @@ export class UsersService {
    * @param userId
    */
   async deleteMyInfo(userId: number): Promise<DeleteMyInfoResponse> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -106,7 +163,7 @@ export class UsersService {
       });
     }
 
-    await this.userRepository.softDelete({ id: userId });
+    await this.deleteUser('id', userId);
 
     return { success: true };
   }

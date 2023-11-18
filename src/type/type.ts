@@ -3,6 +3,10 @@ type AccessToken = {
   accessToken: string;
 };
 
+type RefreshToken = {
+  refreshToken: string;
+};
+
 type Tokens = {
   accessToken: string;
   refreshToken: string;
@@ -15,11 +19,35 @@ type NicknameValidationResponse = {
 // User
 type User = {
   id: number;
+  snsId: string;
   name: string;
   nickname: string;
   birthday: Date;
+  bank: string;
+  account: string;
   profileImgSrc: string;
   fcmId: string;
+  alarm: boolean;
+};
+
+type CreateUserDAO = {
+  snsId: string;
+  name: string;
+  nickname: string;
+  birthday: Date;
+  bank: string;
+  account: string;
+  profileImgSrc: string;
+  fcmId: string;
+};
+
+type UpdateUserDAO = {
+  name: string;
+  nickname: string;
+  birthday: Date;
+  bank: string;
+  account: string;
+  profileImgSrc: string;
   alarm: boolean;
 };
 
@@ -61,6 +89,17 @@ type Present = {
   longComment: string;
 };
 
+type CreatePresentDAO = {
+  name: string;
+  productLink: string;
+  goal: number;
+  deadline: Date;
+  presentImages: string[];
+  representImage: string;
+  shortComment: string;
+  longComment: string;
+};
+
 type PresentWithUser = {
   user: User;
   present: Present;
@@ -89,12 +128,15 @@ export type {
   Tokens,
   NicknameValidationResponse,
   User,
+  CreateUserDAO,
+  UpdateUserDAO,
   DeleteMyInfoResponse,
   Follower,
   FollowResponse,
   UnFollowResponse,
   Present,
   PresentWithUser,
+  CreatePresentDAO,
   CreatePresentResponse,
   UpdatePresentResponse,
   DeletePresentResponse,

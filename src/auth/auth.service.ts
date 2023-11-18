@@ -1,13 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  LoggerService,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
@@ -15,16 +6,18 @@ import { SlackApiClient } from '../utils/slack.api.client';
 import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
+  private slackClient: SlackApiClient;
+
   constructor(
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
-    private dataSource: DataSource,
-    private readonly jwtService: JwtService,
-    @Inject(Logger) private readonly logger: LoggerService,
-  ) {}
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {
+    this.slackClient = new SlackApiClient();
+  }
 
   /**
    * 로그인
@@ -33,9 +26,7 @@ export class AuthService {
   async signIn(data: SigninRequestDto): Promise<Tokens> {
     const { snsId } = data;
 
-    const user = await this.userRepository.findOne({
-      where: { snsId: snsId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('snsId', snsId);
 
     if (!user) {
       throw new BadRequestException({
@@ -44,7 +35,10 @@ export class AuthService {
       });
     }
 
-    return this.createToken(user.id);
+    const accessToken = this.createAccessToken(user.id);
+    const refreshToken = this.createRefreshToken(user.id);
+
+    return { accessToken, refreshToken };
   }
 
   /**
@@ -52,20 +46,9 @@ export class AuthService {
    * @param data
    */
   async signUp(data: SignupRequestDto): Promise<Tokens> {
-    const {
-      snsId,
-      name,
-      nickname,
-      birthday,
-      bank,
-      account,
-      fcmId,
-      profileImageSrc,
-    } = data;
-    // snsId로 유저 식별
-    const snsIdExist = await this.userRepository.findOne({
-      where: { snsId: snsId, deletedAt: null },
-    });
+    const { snsId, nickname, fcmId } = data;
+
+    const snsIdExist = await this.usersService.findUser('snsId', snsId);
 
     if (snsIdExist) {
       throw new BadRequestException({
@@ -74,10 +57,7 @@ export class AuthService {
       });
     }
 
-    // fcmId로 유저 다시 식별
-    const fcmIdExist = await this.userRepository.findOne({
-      where: { fcmId: fcmId, deletedAt: null },
-    });
+    const fcmIdExist = await this.usersService.findUser('fcmId', fcmId);
 
     if (fcmIdExist) {
       throw new BadRequestException({
@@ -86,50 +66,26 @@ export class AuthService {
       });
     }
 
-    // validation이 있지만 닉네임 중복 다시 체크
-    const nicknameCheck = await this.userRepository.findOne({
-      where: { nickname: nickname, deletedAt: null },
-    });
+    const nicknameExist = await this.usersService.findUser(
+      'nickname',
+      nickname,
+    );
 
-    if (nicknameCheck) {
+    if (nicknameExist) {
       throw new BadRequestException({
         message: '이미 사용중인 닉네임 입니다!',
         code: customErrorCode.DUPLICATE_NICKNAME,
       });
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const user = await this.usersService.createUser(data);
 
-    try {
-      // 유저 저장 (profileImage등록 안하면 기본 이미지로 설정
-      const newUser = new UserEntity();
-      newUser.snsId = snsId;
-      newUser.name = name;
-      newUser.nickname = nickname;
-      newUser.bank = bank;
-      newUser.account = account;
-      newUser.fcmId = fcmId;
-      newUser.birthday = birthday;
-      newUser.profileImgSrc =
-        profileImageSrc === null ? 'basic.png' : profileImageSrc;
-      newUser.alarm = true;
+    await this.slackClient.newUser();
 
-      await queryRunner.manager.save(newUser);
+    const accessToken = this.createAccessToken(user.id);
+    const refreshToken = this.createRefreshToken(user.id);
 
-      const slackClient = new SlackApiClient();
-
-      await slackClient.newUser();
-
-      await queryRunner.commitTransaction();
-
-      return this.createToken(newUser.id);
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
+    return { accessToken, refreshToken };
   }
 
   /**
@@ -141,16 +97,16 @@ export class AuthService {
   ): Promise<NicknameValidationResponse> {
     const { nickname } = data;
 
-    if (this.checkSlang(nickname)) {
+    const slang = this.checkSlang(nickname);
+
+    if (slang) {
       throw new BadRequestException({
         message: '사용할 수 없는 단어가 포함되어 있습니다!',
         code: customErrorCode.INVALID_NICKNAME,
       });
     }
 
-    const user = await this.userRepository.findOne({
-      where: { nickname: nickname, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('nickname', nickname);
 
     if (user) {
       throw new BadRequestException({
@@ -160,21 +116,6 @@ export class AuthService {
     }
 
     return { success: true };
-  }
-
-  /**
-   * refreshToken으로 accessToken 재생성
-   * @param userId
-   */
-  refreshToken(userId: number): AccessToken {
-    const accessToken = this.jwtService.sign(
-      { userId: `${userId}` },
-      {
-        expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE}`,
-      },
-    );
-
-    return { accessToken: accessToken };
   }
 
   /**
@@ -189,22 +130,36 @@ export class AuthService {
   }
 
   /**
-   * userId로 토큰 생성
+   * refreshToken으로 accessToken 재생성
    * @param userId
    */
-  createToken(userId: number): Tokens {
-    const accessToken = this.jwtService.sign(
+  refresh(userId: number): AccessToken {
+    const accessToken = this.createRefreshToken(userId);
+
+    return { accessToken: accessToken };
+  }
+
+  /**
+   * accessToken 생성
+   * @param userId
+   */
+  createAccessToken(userId: number): string {
+    return this.jwtService.sign(
       { userId: `${userId}` },
       {
         expiresIn: `${process.env.ACCESS_TOKEN_EXPIRE}`,
       },
     );
+  }
 
-    const refreshToken = this.jwtService.sign(
+  /**
+   * refreshToken 생성
+   * @param userId
+   */
+  createRefreshToken(userId: number): string {
+    return this.jwtService.sign(
       { userId: `${userId}` },
       { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRE}` },
     );
-
-    return { accessToken: accessToken, refreshToken: refreshToken };
   }
 }

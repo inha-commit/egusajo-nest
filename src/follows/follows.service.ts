@@ -1,18 +1,13 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  LoggerService,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Follower, FollowResponse, UnFollowResponse, User } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ModelConverter } from '../type/model.converter';
 import { FollowEntity } from '../entities/follow.entity';
 import { FollowRequestDto } from './dto/follow.request.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FollowsService {
@@ -21,9 +16,23 @@ export class FollowsService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private followRepository: Repository<FollowEntity>,
-    private dataSource: DataSource,
-    @Inject(Logger) private readonly logger: LoggerService,
+    private usersService: UsersService,
   ) {}
+
+  async createFollow(follower: UserEntity, user: UserEntity): Promise<void> {
+    const follow = new FollowEntity();
+    follow.following = follower;
+    follow.follower = user;
+
+    await this.followRepository.save(follow);
+  }
+
+  async deleteFollow(followerId: number, followingId: number): Promise<void> {
+    await this.followRepository.softDelete({
+      followerId: followerId,
+      followingId: followingId,
+    });
+  }
 
   /**
    * Id로 팔로우 하기
@@ -34,9 +43,7 @@ export class FollowsService {
     userId: number,
     followingId: number,
   ): Promise<FollowResponse> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -46,22 +53,16 @@ export class FollowsService {
     }
 
     // 팔로우 할 사람
-    const followUser = await this.userRepository.findOne({
-      where: { id: followingId, deletedAt: null },
-    });
+    const follower = await this.usersService.findUser('id', followingId);
 
-    if (!followUser) {
+    if (!follower) {
       throw new BadRequestException({
         message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    const follow = new FollowEntity();
-    follow.following = followUser;
-    follow.follower = user;
-
-    await this.followRepository.save(follow);
+    await this.createFollow(follower, user);
 
     return { success: true };
   }
@@ -77,10 +78,7 @@ export class FollowsService {
   ): Promise<FollowResponse> {
     const { nickname } = data;
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-      relations: ['Followings'],
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -90,22 +88,16 @@ export class FollowsService {
     }
 
     // 팔로우 할 사람
-    const followUser = await this.userRepository.findOne({
-      where: { nickname: nickname, deletedAt: null },
-    });
+    const follower = await this.usersService.findUser('nickname', nickname);
 
-    if (!followUser) {
+    if (!follower) {
       throw new BadRequestException({
         message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    const follow = new FollowEntity();
-    follow.following = followUser;
-    follow.follower = user;
-
-    await this.followRepository.save(follow);
+    await this.createFollow(follower, user);
 
     return { success: true };
   }
@@ -176,10 +168,7 @@ export class FollowsService {
     userId: number,
     followingId: number,
   ): Promise<UnFollowResponse> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-      relations: ['Followings'],
-    });
+    const user = await this.usersService.findUser('id', userId);
 
     if (!user) {
       throw new BadRequestException({
@@ -189,21 +178,18 @@ export class FollowsService {
     }
 
     // 언팔로우 할 사람
-    const following = await this.userRepository.findOne({
-      where: { id: followingId, deletedAt: null },
-    });
+    const follower = await this.usersService.findUser('id', followingId);
 
-    if (!following) {
+    if (!follower) {
       throw new BadRequestException({
         message: '존재하지 않은 유저입니다!',
         code: customErrorCode.USER_NOT_FOUND,
       });
     }
 
-    await this.followRepository.delete({
-      followerId: userId,
-      followingId: following.id,
-    });
+    // TODO: 원래 follow관계가 아니였던 경우는?
+
+    await this.deleteFollow(follower.id, user.id);
 
     return { success: true };
   }
