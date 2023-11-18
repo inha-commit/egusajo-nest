@@ -49,6 +49,13 @@ export class PresentsService {
       longComment,
     } = createPresentDAO;
 
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
     if (goal <= 0) {
       throw new BadRequestException({
         message: '목표 금액은 0원보다 높아야 합니다!',

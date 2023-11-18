@@ -33,6 +33,18 @@ export class GetMyInfoResponseDto {
   readonly account: string;
 
   @ApiProperty({
+    description: '사용자 은행',
+  })
+  @IsString()
+  readonly bank: string;
+
+  @ApiProperty({
+    description: '사용자 계좌번호',
+  })
+  @IsString()
+  readonly account: string;
+
+  @ApiProperty({
     name: 'profileImgSsrc',
     description: '사용자 이미지 주소 url',
   })
