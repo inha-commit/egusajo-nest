@@ -72,7 +72,7 @@ export class FundsService {
   ) {
     return this.fundingRepository.find({
       where: { [property]: value, deletedAt: null },
-      relations: ['Present'],
+      relations: relations,
       skip: skip,
       take: take,
     });
