@@ -10,9 +10,12 @@ import { UserEntity } from '../entities/user.entity';
 import { CreateFundDAO } from '../type/type';
 import { ModelConverter } from '../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
+import { FcmApiClient } from '../utils/fcm.api.client';
 
 @Injectable()
 export class FundsService {
+  private fcmApiClient: FcmApiClient;
+
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
@@ -23,7 +26,9 @@ export class FundsService {
     private usersService: UsersService,
     private presentsService: PresentsService,
     private dataSource: DataSource,
-  ) {}
+  ) {
+    this.fcmApiClient = new FcmApiClient();
+  }
 
   async createFund(
     createFundDAO: CreateFundDAO,

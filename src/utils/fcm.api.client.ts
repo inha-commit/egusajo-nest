@@ -19,19 +19,62 @@ export class FcmApiClient {
       universe_domain: process.env.FCM_CREDENTIAL_UNIVERSE_DOMAIN,
     };
 
-    this.admin = admin.initializeApp({
-      credential: admin.credential.cert(credential as unknown),
-    });
+    if (admin.apps.length === 0) {
+      this.admin = admin.initializeApp({
+        credential: admin.credential.cert(credential as unknown),
+      });
+    }
   }
 
-  async send() {
+  async newFundingMessage(
+    senderNickname: string,
+    money: number,
+    fcmToken: string,
+  ) {
     const message = {
       data: {
-        title: '집',
-        body: '가고싶다',
+        title: '펀딩 도착 알림',
+        body: `${senderNickname}님이 ${money}원을 펀딩해 주셨어요!`,
       },
-      token: 'token',
+      token: fcmToken,
     };
+
+    await this.admin.messaging().send(message);
+  }
+
+  async completeFundingMessage(fcmToken: string) {
+    const message = {
+      data: {
+        title: '펀딩 마감 알림',
+        body: `펀딩이 마감되었어요!`,
+      },
+      token: fcmToken,
+    };
+
+    await this.admin.messaging().send(message);
+  }
+
+  async newFollowerMessage(userNickname: string, fcmToken: string) {
+    const message = {
+      data: {
+        title: '친구 요청 알림',
+        body: `${userNickname}님이 친구가 되고 싶어해요`,
+      },
+      token: fcmToken,
+    };
+
+    await this.admin.messaging().send(message);
+  }
+
+  async followAcceptMessage(userNickname: string, fcmToken: string) {
+    const message = {
+      data: {
+        title: '친구 요청 수락 알림',
+        body: `${userNickname}님과 친구가 되었어요!`,
+      },
+      token: fcmToken,
+    };
+
     await this.admin.messaging().send(message);
   }
 }

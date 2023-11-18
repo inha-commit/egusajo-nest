@@ -7,6 +7,8 @@ import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 import { UsersService } from '../users/users.service';
+import Redis from 'ioredis';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     this.slackClient = new SlackApiClient();
   }
@@ -31,7 +34,7 @@ export class AuthService {
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
 
-    // TODO: 여기 redis에 user fcmId 저장
+    await this.saveRedisFcmToken(user.id, user.fcmId);
 
     return { accessToken, refreshToken };
   }
@@ -75,6 +78,8 @@ export class AuthService {
 
     const user = await this.usersService.createUser(data);
 
+    await this.saveRedisFcmToken(user.id, user.fcmId);
+
     await this.slackClient.newUser();
 
     const accessToken = this.createAccessToken(user.id);
@@ -104,6 +109,19 @@ export class AuthService {
     }
 
     return { success: true };
+  }
+
+  /**
+   * fcmToken redis에 저장
+   * @param userId
+   * @param fcmToken
+   */
+  async saveRedisFcmToken(userId: number, fcmToken: string): Promise<void> {
+    await this.redis.set(userId.toString(), fcmToken);
+  }
+
+  async getFcmToken(userId: number): Promise<string> {
+    return this.redis.get(userId.toString());
   }
 
   /**

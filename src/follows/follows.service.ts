@@ -8,16 +8,23 @@ import { ModelConverter } from '../type/model.converter';
 import { FollowEntity } from '../entities/follow.entity';
 import { FollowRequestDto } from './dto/follow.request.dto';
 import { UsersService } from '../users/users.service';
+import { AuthService } from '../auth/auth.service';
+import { FcmApiClient } from '../utils/fcm.api.client';
 
 @Injectable()
 export class FollowsService {
+  private fcmApiClient: FcmApiClient;
+
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private followRepository: Repository<FollowEntity>,
+    private authService: AuthService,
     private usersService: UsersService,
-  ) {}
+  ) {
+    this.fcmApiClient = new FcmApiClient();
+  }
 
   async createFollow(follower: UserEntity, user: UserEntity): Promise<void> {
     const follow = new FollowEntity();
@@ -48,6 +55,9 @@ export class FollowsService {
     // 팔로우 할 사람
     const follower = await this.usersService.findUser('id', followingId, null);
 
+    // TODO: 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
+    const fcmToken = await this.authService.getFcmToken(userId);
+
     await this.createFollow(follower, user);
 
     return { success: true };
@@ -72,6 +82,8 @@ export class FollowsService {
       nickname,
       null,
     );
+
+    // TODO: 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
 
     if (!follower) {
       throw new BadRequestException({
