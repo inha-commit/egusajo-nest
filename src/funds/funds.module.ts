@@ -7,6 +7,7 @@ import { UserEntity } from '../entities/user.entity';
 import { PresentEntity } from '../entities/present.entity';
 import { PresentImageEntity } from '../entities/presentImage.entity';
 import { FundingEntity } from '../entities/funding.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { FundingEntity } from '../entities/funding.entity';
     ]),
   ],
   controllers: [FundsController],
-  providers: [FundsService, UsersService],
+  providers: [FundsService, UsersService, JwtService],
 })
 export class FundsModule {}

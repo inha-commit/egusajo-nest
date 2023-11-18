@@ -160,8 +160,39 @@ export class PresentsController {
 
     const response = await this.presentsService.getPresents(
       request.userId,
-      query.page,
+      parseInt(query.page),
     );
+    return new GetPresentsResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '내 선물 게시물 가져오기',
+    description: 'GetPresentResponseDto',
+  })
+  @ApiHeader({
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
+  })
+  @ApiQuery({ name: 'page', type: Number, description: '페이지' })
+  @ApiOkResponse({
+    type: GetPresentsResponseDto,
+  })
+  @UseGuards(AccessTokenGuard)
+  @Get('/me')
+  async getMyPresents(@Req() request, @Query() query) {
+    if (!query.page || typeof parseInt(query.page) !== 'number') {
+      throw new BadRequestException({
+        message: 'page는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_QUERY,
+      });
+    }
+
+    const response = await this.presentsService.getMyPresents(
+      request.userId,
+      parseInt(query.page),
+    );
+
     return new GetPresentsResponseDto(response);
   }
 
@@ -361,10 +392,10 @@ export class PresentsController {
   @Patch('/:presentId')
   async updatePresent(
     @Req() request,
-    @Param('presentId') presentId: number,
+    @Param('presentId') presentId: string,
     @Body() data: UpdatePresentRequestDto,
   ) {
-    if (!presentId || typeof presentId !== 'number') {
+    if (!presentId || typeof parseInt(presentId) !== 'number') {
       throw new BadRequestException({
         message: 'presentId는 number type이어야 합니다!',
         code: customErrorCode.INVALID_PARAM,
@@ -373,7 +404,7 @@ export class PresentsController {
 
     const response = await this.presentsService.updatePresent(
       request.userId,
-      presentId,
+      parseInt(presentId),
       data,
     );
 
@@ -450,8 +481,8 @@ export class PresentsController {
   })
   @UseGuards(AccessTokenGuard)
   @Delete('/:presentId')
-  async deletePresent(@Req() request, @Param('presentId') presentId: number) {
-    if (!presentId || typeof presentId !== 'number') {
+  async deletePresent(@Req() request, @Param('presentId') presentId: string) {
+    if (!presentId || typeof parseInt(presentId) !== 'number') {
       throw new BadRequestException({
         message: 'presentId는 number type이어야 합니다!',
         code: customErrorCode.INVALID_PARAM,
@@ -460,7 +491,7 @@ export class PresentsController {
 
     const response = await this.presentsService.deletePresent(
       request.userId,
-      presentId,
+      parseInt(presentId),
     );
 
     return new DeletePresentResponseDto(response);
@@ -554,7 +585,7 @@ export class PresentsController {
     }
 
     const response = await this.fundsService.Funding(
-      request.userId,
+      parseInt(request.userId),
       parseInt(presentId),
       data,
     );
@@ -586,7 +617,7 @@ export class PresentsController {
     }
 
     await this.fundsService.deleteFunding(
-      request.userId,
+      parseInt(request.userId),
       parseInt(presentId),
       parseInt(fundId),
     );

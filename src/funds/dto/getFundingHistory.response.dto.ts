@@ -1,39 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { createdAtToString, deadlineToString } from '../../hooks/date';
 
-class User {
-  @ApiProperty({
-    name: 'id',
-    description: '선물 게시글 작성자 Id',
-  })
-  id: number;
-
-  @ApiProperty({
-    name: 'name',
-    description: '선물 게시글 작성자 이름',
-  })
-  name: string;
-
-  @ApiProperty({
-    name: 'nickname',
-    description: '선물 게시글 작성자 닉네임',
-  })
-  nickname: string;
-
-  @ApiProperty({
-    name: 'profileImgSrc',
-    description: '선물 게시글 작성자 이미지',
-  })
-  profileImgSrc: string;
-
-  constructor(obj: User) {
-    this.id = obj.id;
-    this.name = obj.name;
-    this.nickname = obj.nickname;
-    this.profileImgSrc = obj.profileImgSrc;
-  }
-}
-
 class Present {
   @ApiProperty({
     name: 'id',
@@ -42,14 +9,14 @@ class Present {
   id: number;
 
   @ApiProperty({
-    name: 'name',
+    name: 'nickname',
     description: '선물 이름',
   })
   name: string;
 
   @ApiProperty({
-    name: 'productLink',
-    description: '선물 링크',
+    name: 'profileImgSrc',
+    description: '선물 대표이미지',
   })
   productLink: string;
 
@@ -99,7 +66,6 @@ class Present {
   @ApiProperty({
     name: 'createdAt',
     description: '게시물 생성 날짜',
-    example: '2023년 11월 23일',
   })
   createdAt: string | Date;
 
@@ -118,14 +84,40 @@ class Present {
   }
 }
 
-class PresentWithUser {
+class Fund {
   @ApiProperty({
-    name: 'user',
-    type: User,
-    description: '선물 게시글 작성자 정보',
+    name: 'id',
+    description: '펀딩한 Id',
   })
-  readonly user: User;
+  id: number;
 
+  @ApiProperty({
+    name: 'cost',
+    description: '펀딩한 금액',
+  })
+  cost: number;
+
+  @ApiProperty({
+    name: 'comment',
+    description: '펀딩 한마디',
+  })
+  comment: string;
+
+  @ApiProperty({
+    name: 'createdAt',
+    description: '펀딩한 날짜',
+  })
+  createdAt: string | Date;
+
+  constructor(obj: Fund) {
+    this.id = obj.id;
+    this.cost = obj.cost;
+    this.comment = obj.comment;
+    this.createdAt = createdAtToString(obj.createdAt);
+  }
+}
+
+class Funds {
   @ApiProperty({
     name: 'present',
     type: Present,
@@ -133,21 +125,28 @@ class PresentWithUser {
   })
   readonly present: Present;
 
-  constructor(obj: PresentWithUser) {
-    this.user = new User(obj.user);
+  @ApiProperty({
+    name: 'fund',
+    type: [Fund],
+    description: '내가한 펀드 목록',
+  })
+  readonly fund: Fund;
+
+  constructor(obj: Funds) {
     this.present = new Present(obj.present);
+    this.fund = new Fund(obj.fund);
   }
 }
 
-export class GetPresentsResponseDto {
-  @ApiProperty({ type: [PresentWithUser] })
-  public presents: PresentWithUser[];
+export class GetFundingHistoryReponseDto {
+  @ApiProperty({ type: [Funds] })
+  public funds: Funds[];
 
-  constructor(obj: PresentWithUser[]) {
-    this.presents = obj.map(
+  constructor(obj: Funds[]) {
+    this.funds = obj.map(
       (item) =>
-        new PresentWithUser({
-          user: item.user,
+        new Funds({
+          fund: item.fund,
           present: item.present,
         }),
     );

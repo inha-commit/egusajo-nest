@@ -55,6 +55,9 @@ export class PresentEntity {
   @Column('text')
   longComment: string;
 
+  @Column('int', { primary: true, name: 'UserId' })
+  UserId: number;
+
   @CreateDateColumn({ nullable: true })
   createdAt: Date;
 
@@ -66,10 +69,16 @@ export class PresentEntity {
 
   // UserEntity와의 관계
   @ManyToOne(() => UserEntity, (users) => users.Present, {
+    createForeignKeyConstraints: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'UserId',
+      referencedColumnName: 'id',
+    },
+  ])
   User: UserEntity;
 
   // FundingEntity와의 관계

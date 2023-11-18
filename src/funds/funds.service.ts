@@ -8,6 +8,7 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserEntity } from '../entities/user.entity';
 import { CreateFundDAO } from '../type/type';
+import { ModelConverter } from '../type/model.converter';
 
 @Injectable()
 export class FundsService {
@@ -122,6 +123,33 @@ export class FundsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getFundingHistory(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId, deletedAt: null },
+    });
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    const fundingHistories = await this.fundingRepository.find({
+      where: { SenderId: userId, deletedAt: null },
+      relations: ['Present'],
+    });
+
+    if (fundingHistories.length === 0) return [];
+
+    return fundingHistories.map((fundingHistory) => {
+      return {
+        fund: ModelConverter.funding(fundingHistory),
+        present: ModelConverter.present(fundingHistory.Present),
+      };
+    });
   }
 
   async deleteFunding(userId: number, presentId: number, fundId: number) {

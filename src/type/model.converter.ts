@@ -32,6 +32,7 @@ export class ModelConverter {
       representImage: present.representImage,
       shortComment: present.shortComment,
       longComment: present.longComment,
+      createdAt: present.createdAt,
     };
   }
 
@@ -47,6 +48,7 @@ export class ModelConverter {
       id: fund.id,
       cost: fund.cost,
       comment: fund.comment,
+      createdAt: fund.createdAt,
     };
   }
 }

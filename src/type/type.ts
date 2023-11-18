@@ -87,6 +87,7 @@ type Present = {
   representImage: string;
   shortComment: string;
   longComment: string;
+  createdAt: Date;
 };
 
 type CreatePresentDAO = {

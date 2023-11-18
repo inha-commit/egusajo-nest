@@ -16,7 +16,6 @@ import { FundingEntity } from '../entities/funding.entity';
 import { ModelConverter } from '../type/model.converter';
 import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
-import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -245,6 +244,36 @@ export class PresentsService {
       fundings: fundings,
       isParticipate: isParticipate,
     };
+  }
+
+  async getMyPresents(
+    userId: number,
+    page: number,
+  ): Promise<PresentWithUser[]> {
+    const user = await this.usersService.findUser('id', userId);
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    const presents = await this.presentRepository.find({
+      where: { UserId: userId, deletedAt: null },
+      skip: page * 10,
+      take: 10,
+      relations: ['User'],
+    });
+
+    if (presents.length === 0) return [];
+
+    return presents.map((present) => {
+      return {
+        present: ModelConverter.present(present),
+        user: ModelConverter.user(present.User),
+      };
+    });
   }
 
   /**

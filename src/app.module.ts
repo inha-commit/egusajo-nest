@@ -26,6 +26,7 @@ import { FundsModule } from './funds/funds.module';
     FollowsModule,
     PresentsModule,
     ImagesModule,
+    FundsModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
@@ -42,7 +43,6 @@ import { FundsModule } from './funds/funds.module';
       }),
       inject: [ConfigService],
     }),
-    FundsModule,
   ],
   controllers: [AppController],
   providers: [
