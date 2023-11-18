@@ -34,7 +34,7 @@ type CreateUserDAO = {
   snsId: string;
   name: string;
   nickname: string;
-  birthday: string;
+  birthday: Date;
   bank: string;
   account: string;
   profileImgSrc: string;
@@ -44,7 +44,7 @@ type CreateUserDAO = {
 type UpdateUserDAO = {
   name: string;
   nickname: string;
-  birthday: string;
+  birthday: Date;
   bank: string;
   account: string;
   profileImgSrc: string;
@@ -93,7 +93,7 @@ type CreatePresentDAO = {
   name: string;
   productLink: string;
   goal: number;
-  deadline: string;
+  deadline: Date;
   presentImages: string[];
   representImage: string;
   shortComment: string;
