@@ -59,6 +59,31 @@ export class UsersService {
   async findUser(
     property: string,
     value: string | number,
+    relations: string[] | null,
+  ): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { [property]: value, deletedAt: null },
+      relations: relations,
+    });
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    return user;
+  }
+
+  /**
+   * 회원가입된 유저인지 조회
+   * @param property
+   * @param value
+   */
+  async validateUser(
+    property: string,
+    value: string | number,
   ): Promise<UserEntity | null> {
     return await this.userRepository.findOne({
       where: { [property]: value, deletedAt: null },
@@ -102,7 +127,7 @@ export class UsersService {
    * @param userId
    */
   async getMyInfo(userId: number): Promise<User> {
-    const user = await this.findUser('id', userId);
+    const user = await this.findUser('id', userId, null);
 
     if (!user) {
       throw new BadRequestException({
@@ -125,17 +150,10 @@ export class UsersService {
   ): Promise<User> {
     const { nickname } = data;
 
-    const user = await this.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.findUser('id', userId, null);
 
     // validation이 있지만 닉네임 중복 다시 체크
-    const nicknameCheck = await this.findUser('nickname', nickname);
+    const nicknameCheck = await this.findUser('nickname', nickname, null);
 
     if (nicknameCheck) {
       throw new BadRequestException({
@@ -154,14 +172,7 @@ export class UsersService {
    * @param userId
    */
   async deleteMyInfo(userId: number): Promise<DeleteMyInfoResponse> {
-    const user = await this.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    await this.findUser('id', userId, null);
 
     await this.deleteUser('id', userId);
 

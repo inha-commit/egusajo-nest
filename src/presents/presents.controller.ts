@@ -158,7 +158,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.presentsService.getPresents(
+    const response = await this.presentsService.getPresentPosts(
       request.userId,
       parseInt(query.page),
     );
@@ -188,7 +188,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.presentsService.getMyPresents(
+    const response = await this.presentsService.getMyPresentPosts(
       request.userId,
       parseInt(query.page),
     );
@@ -265,7 +265,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.presentsService.getPresent(
+    const response = await this.presentsService.getPresentPost(
       request.userId,
       parseInt(presentId),
     );
@@ -402,7 +402,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.presentsService.updatePresent(
+    const response = await this.presentsService.updatePresentPost(
       request.userId,
       parseInt(presentId),
       data,

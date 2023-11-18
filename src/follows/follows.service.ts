@@ -43,24 +43,10 @@ export class FollowsService {
     userId: number,
     followingId: number,
   ): Promise<FollowResponse> {
-    const user = await this.usersService.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.usersService.findUser('id', userId, null);
 
     // 팔로우 할 사람
-    const follower = await this.usersService.findUser('id', followingId);
-
-    if (!follower) {
-      throw new BadRequestException({
-        message: '존재하지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
-      });
-    }
+    const follower = await this.usersService.findUser('id', followingId, null);
 
     await this.createFollow(follower, user);
 
@@ -78,17 +64,14 @@ export class FollowsService {
   ): Promise<FollowResponse> {
     const { nickname } = data;
 
-    const user = await this.usersService.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.usersService.findUser('id', userId, null);
 
     // 팔로우 할 사람
-    const follower = await this.usersService.findUser('nickname', nickname);
+    const follower = await this.usersService.findUser(
+      'nickname',
+      nickname,
+      null,
+    );
 
     if (!follower) {
       throw new BadRequestException({
@@ -103,21 +86,11 @@ export class FollowsService {
   }
 
   /**
-   * 내가 팔로우 하는 유저들 정보 가져오가
+   * 내가 팔로우 하는 유저들 정보 가져오기
    * @param userId
    */
   async getFollowings(userId: number): Promise<User[]> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-      relations: ['Followings'],
-    });
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.usersService.findUser('id', userId, ['Followings']);
 
     return user.Followings.map((following) => {
       return ModelConverter.user(following);
@@ -129,17 +102,10 @@ export class FollowsService {
    * @param userId
    */
   async getFollowers(userId: number): Promise<Follower[]> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-      relations: ['Followers', 'Followings'],
-    });
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.usersService.findUser('id', userId, [
+      'Followers',
+      'Followings',
+    ]);
 
     const followings = user.Followings;
     const followers = user.Followers;
@@ -168,26 +134,10 @@ export class FollowsService {
     userId: number,
     followingId: number,
   ): Promise<UnFollowResponse> {
-    const user = await this.usersService.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+    const user = await this.usersService.findUser('id', userId, null);
 
     // 언팔로우 할 사람
-    const follower = await this.usersService.findUser('id', followingId);
-
-    if (!follower) {
-      throw new BadRequestException({
-        message: '존재하지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
-      });
-    }
-
-    // TODO: 원래 follow관계가 아니였던 경우는?
+    const follower = await this.usersService.findUser('id', followingId, null);
 
     await this.deleteFollow(follower.id, user.id);
 

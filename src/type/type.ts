@@ -101,9 +101,28 @@ type CreatePresentDAO = {
   longComment: string;
 };
 
+type UpdatePresentDAO = {
+  name: string;
+  productLink: string;
+  goal: number;
+  deadline: Date;
+  presentImages: string[];
+  representImage: string;
+  shortComment: string;
+  longComment: string;
+};
+
 type PresentWithUser = {
   user: User;
   present: Present;
+};
+
+type PresentWithFund = {
+  user: User;
+  present: Present;
+  presentImages: string[];
+  fundings: FundWithUser[];
+  isParticipate: boolean;
 };
 
 type CreatePresentResponse = {
@@ -125,9 +144,21 @@ type PresentImage = {
 };
 
 // Fund
+type Fund = {
+  id: number;
+  cost: number;
+  comment: string;
+  createdAt: Date;
+};
+
 type CreateFundDAO = {
   cost: number;
   comment: string;
+};
+
+type FundWithUser = {
+  funding: Fund;
+  user: User;
 };
 
 export type {
@@ -144,9 +175,12 @@ export type {
   Present,
   PresentWithUser,
   CreatePresentDAO,
+  UpdatePresentDAO,
   CreatePresentResponse,
   UpdatePresentResponse,
   DeletePresentResponse,
   PresentImage,
   CreateFundDAO,
+  PresentWithFund,
+  FundWithUser,
 };
