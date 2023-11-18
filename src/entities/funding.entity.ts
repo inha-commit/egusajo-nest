@@ -25,6 +25,12 @@ export class FundingEntity {
   @Column('text')
   comment: string;
 
+  @Column('int', { primary: true, name: 'SenderId' })
+  SenderId: number;
+
+  @Column('int', { primary: true, name: 'ReceiverId' })
+  ReceiverId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -44,6 +50,7 @@ export class FundingEntity {
 
   // UserEntity와의 관계 - 펀딩 한 사람
   @ManyToOne(() => UserEntity, (users) => users.Funding, {
+    createForeignKeyConstraints: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
@@ -52,6 +59,7 @@ export class FundingEntity {
 
   // UserEntity와의 관계 - 펀딩 받은 사람
   @ManyToOne(() => UserEntity, (users) => users.Funded, {
+    createForeignKeyConstraints: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })

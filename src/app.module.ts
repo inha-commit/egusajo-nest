@@ -17,6 +17,7 @@ import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 import { CustomErrorFilter } from './type/custom.error.filter';
 import { SlackApiClient } from './utils/slack.api.client';
+import { FundsModule } from './funds/funds.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SlackApiClient } from './utils/slack.api.client';
     FollowsModule,
     PresentsModule,
     ImagesModule,
+    FundsModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,

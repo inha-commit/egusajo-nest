@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { createdAtToString, deadlineToString } from '../../hooks/date';
 
 class User {
   @ApiProperty({
@@ -95,31 +96,25 @@ class Present {
   })
   longComment: string;
 
+  @ApiProperty({
+    name: 'createdAt',
+    description: '게시물 생성 날짜',
+    example: '2023년 11월 23일',
+  })
+  createdAt: string | Date;
+
   constructor(obj: Present) {
-    const today = new Date();
-    const deadlineDate = new Date(obj.deadline);
-
-    const timeDiff = deadlineDate.getTime() - today.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
     this.id = obj.id;
     this.name = obj.name;
     this.productLink = obj.productLink;
     this.complete = obj.complete;
     this.goal = obj.goal;
-    if (daysDiff > 1) {
-      this.deadline = `D-${daysDiff}`;
-    } else if (daysDiff === 1) {
-      this.deadline = 'D-1';
-    } else if (daysDiff < 1 && daysDiff >= 0) {
-      this.deadline = 'D-day';
-    } else {
-      this.deadline = 'END';
-    }
+    this.deadline = deadlineToString(obj.deadline);
     this.money = obj.money;
     this.representImage = obj.representImage;
     this.shortComment = obj.shortComment;
     this.longComment = obj.longComment;
+    this.createdAt = createdAtToString(obj.createdAt);
   }
 }
 
@@ -219,6 +214,13 @@ export class GetPresentResponseDto {
   readonly present: Present;
 
   @ApiProperty({
+    name: 'isParticipate',
+    type: Boolean,
+    description: '내가 해당 선물에 펀딩 했는지 정보',
+  })
+  readonly isParticipate: boolean;
+
+  @ApiProperty({
     name: 'presentImages',
     type: [String],
     description: '선물 이미지들',
@@ -237,5 +239,6 @@ export class GetPresentResponseDto {
     this.present = new Present(obj.present);
     this.presentImages = obj.presentImages;
     this.fundings = obj.fundings.map((funding) => new FundingWithUser(funding));
+    this.isParticipate = obj.isParticipate;
   }
 }

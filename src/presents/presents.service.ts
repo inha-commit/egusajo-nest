@@ -16,7 +16,6 @@ import { FundingEntity } from '../entities/funding.entity';
 import { ModelConverter } from '../type/model.converter';
 import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
-import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -225,7 +224,13 @@ export class PresentsService {
       presentImages.push(presentImage.src);
     });
 
+    let isParticipate = false;
+
     const fundings = present.Funding.map((funding) => {
+      if (funding.Sender.id == userId) {
+        isParticipate = true;
+      }
+
       return {
         funding: ModelConverter.funding(funding),
         user: ModelConverter.user(funding.Sender),
@@ -237,7 +242,38 @@ export class PresentsService {
       present: ModelConverter.present(present),
       presentImages: presentImages,
       fundings: fundings,
+      isParticipate: isParticipate,
     };
+  }
+
+  async getMyPresents(
+    userId: number,
+    page: number,
+  ): Promise<PresentWithUser[]> {
+    const user = await this.usersService.findUser('id', userId);
+
+    if (!user) {
+      throw new BadRequestException({
+        message: '회원가입 되지 않은 유저입니다!',
+        code: customErrorCode.USER_NOT_AUTHENTICATED,
+      });
+    }
+
+    const presents = await this.presentRepository.find({
+      where: { UserId: userId, deletedAt: null },
+      skip: page * 10,
+      take: 10,
+      relations: ['User'],
+    });
+
+    if (presents.length === 0) return [];
+
+    return presents.map((present) => {
+      return {
+        present: ModelConverter.present(present),
+        user: ModelConverter.user(present.User),
+      };
+    });
   }
 
   /**
@@ -393,185 +429,5 @@ export class PresentsService {
     await this.presentRepository.softDelete({ id: presentId });
 
     return { success: true };
-  }
-
-  async createFunding(
-    userId: number,
-    presentId: number,
-    data: CreateFundingRequestDto,
-  ) {
-    const { cost, comment } = data;
-
-    const user = await this.usersService.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
-
-    if (cost <= 0) {
-      throw new BadRequestException({
-        message: '금액은 최소 0원 이상이어야 합니다!',
-        code: customErrorCode.FUNDING_MONEY_SHORT_FALL,
-      });
-    }
-
-    if (present.deadline < new Date()) {
-      throw new BadRequestException({
-        message: '이미 종료된 펀딩입니다!',
-        code: customErrorCode.FUNDING_ALREADY_END,
-      });
-    }
-
-    // TODO: 이미 펀딩을 했다면 불가하게?
-
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      await queryRunner.manager.getRepository(FundingEntity).save({
-        cost: cost,
-        comment: comment,
-        Present: present,
-        Sender: user,
-        Receiver: present.User,
-      });
-
-      const total_money = present.money + cost;
-      let total_complete = present.complete;
-
-      if (total_money >= present.goal) {
-        total_complete = true;
-      }
-
-      present.money = total_money;
-      present.complete = total_complete;
-
-      await queryRunner.manager.getRepository(PresentEntity).save(present);
-      // TODO: 여기서 완료된 펀딩에는 조치를 취해야 함
-
-      // TODO: 여기서 펀딩받은 사람에게 알림 보내기
-      await queryRunner.commitTransaction();
-
-      return { success: true };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  async deleteFunding(userId: number, presentId: number, fundId: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
-
-    const fund = await this.fundingRepository.findOne({
-      where: { id: fundId, deletedAt: null },
-      relations: ['Sender'],
-    });
-
-    if (!fund) {
-      throw new BadRequestException({
-        message: '존재하지 않는 펀딩 입니다!',
-        code: customErrorCode.FUNDING_NOT_FOUND,
-      });
-    }
-
-    if (fund.Sender.id !== userId) {
-      throw new BadRequestException({
-        message: '내가 한 펀딩만 취소할 수 있습니다.',
-        code: customErrorCode.FUNDING_NOT_MINE,
-      });
-    }
-
-    if (present.complete === true) {
-      throw new BadRequestException({
-        message: '완료된 펀딩에 대해서는 취소할 수 없습니다!',
-        code: customErrorCode.FUNDING_ALREADY_COMPLETE,
-      });
-    }
-
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      // funding 삭제
-      await this.fundingRepository.softDelete({ id: fundId });
-
-      // present에서 money 차감
-      const total_money = present.money - fund.cost;
-      let total_complete = present.complete;
-
-      if (total_money < present.goal) {
-        total_complete = false;
-      }
-
-      present.money = total_money;
-      present.complete = total_complete;
-
-      await queryRunner.manager.getRepository(PresentEntity).save(present);
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
-  stringToDate(deadline: string) {
-    // class-validator에서는 string 여부만 막았지만 이상한 문자열이 들어올 수 있으니 방지
-    if (isNaN(parseInt(deadline))) {
-      throw new BadRequestException({
-        message: '잘못된 날짜 형식입니다',
-        code: customErrorCode.PRESENT_INVALID_DATE,
-      });
-    }
-    // 문자열을 'YYYY-MM-DD' 형식으로 변환
-    const formattedDateString = deadline.replace(
-      /(\d{4})(\d{2})(\d{2})/,
-      '$1-$2-$3',
-    );
-
-    // DateTime 객체로 변환
-    return new Date(formattedDateString);
   }
 }
