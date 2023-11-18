@@ -105,7 +105,8 @@ class Fund {
 
   @ApiProperty({
     name: 'createdAt',
-    description: '펀딩한 날짜',
+    description: '게시물 생성 날짜',
+    example: '2023년 11월 23일',
   })
   createdAt: string | Date;
 
@@ -127,7 +128,7 @@ class Funds {
 
   @ApiProperty({
     name: 'fund',
-    type: [Fund],
+    type: Fund,
     description: '내가한 펀드 목록',
   })
   readonly fund: Fund;

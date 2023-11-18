@@ -125,7 +125,7 @@ export class FundsService {
     }
   }
 
-  async getFundingHistory(userId: number) {
+  async getFundingHistory(userId: number, page: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId, deletedAt: null },
     });
@@ -139,6 +139,8 @@ export class FundsService {
 
     const fundingHistories = await this.fundingRepository.find({
       where: { SenderId: userId, deletedAt: null },
+      skip: page * 10,
+      take: 10,
       relations: ['Present'],
     });
 
