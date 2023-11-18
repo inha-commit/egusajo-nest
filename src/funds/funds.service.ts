@@ -34,13 +34,6 @@ export class FundsService {
   ): Promise<FundingEntity> {
     const { cost, comment } = createFundDAO;
 
-    if (cost <= 0) {
-      throw new BadRequestException({
-        message: '금액은 최소 0원 이상이어야 합니다!',
-        code: customErrorCode.FUNDING_MONEY_SHORT_FALL,
-      });
-    }
-
     return await queryRunner.manager.getRepository(FundingEntity).save({
       cost: cost,
       comment: comment,
@@ -105,6 +98,13 @@ export class FundsService {
       });
     }
 
+    if (cost <= 0) {
+      throw new BadRequestException({
+        message: '금액은 최소 0원 이상이어야 합니다!',
+        code: customErrorCode.FUNDING_MONEY_SHORT_FALL,
+      });
+    }
+
     // TODO: 이미 펀딩을 했다면 불가하게?
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -135,7 +135,6 @@ export class FundsService {
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
     } finally {
       await queryRunner.release();
     }
@@ -209,7 +208,6 @@ export class FundsService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
     } finally {
       await queryRunner.release();
     }
