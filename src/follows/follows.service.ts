@@ -28,7 +28,7 @@ export class FollowsService {
   }
 
   async deleteFollow(followerId: number, followingId: number): Promise<void> {
-    await this.followRepository.softDelete({
+    await this.followRepository.delete({
       followerId: followerId,
       followingId: followingId,
     });
@@ -139,7 +139,7 @@ export class FollowsService {
     // 언팔로우 할 사람
     const follower = await this.usersService.findUser('id', followingId, null);
 
-    await this.deleteFollow(follower.id, user.id);
+    await this.deleteFollow(user.id, follower.id);
 
     return { success: true };
   }
