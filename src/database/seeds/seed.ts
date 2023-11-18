@@ -25,18 +25,31 @@ export default class UserSeeder implements Seeder {
     const users = await userFactory.saveMany(99);
 
     // 100번 유저에 대해 모든 유저 팔로우하기
-    const follows = [];
+    const followings = [];
     await (async () => {
       for (let i = 2; i < 100; i++) {
         const follow = await followFactory.make({
           followingId: i,
           followerId: 1,
         });
-        follows.push(follow);
+        followings.push(follow);
       }
     })();
 
-    await followRepository.save(follows);
+    await followRepository.save(followings);
+
+    const followers = [];
+    await (async () => {
+      for (let i = 2; i < 100; i++) {
+        const follow = await followFactory.make({
+          followingId: 1,
+          followerId: i,
+        });
+        followers.push(follow);
+      }
+    })();
+
+    await followRepository.save(followers);
 
     // Present 삽입
     const presents = [];
