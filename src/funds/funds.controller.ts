@@ -1,15 +1,24 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AccessTokenGuard } from '../guard/access.token.guard';
 import { FundsService } from './funds.service';
 import {
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { GetFundingHistoryReponseDto } from './dto/getFundingHistory.response.dto';
 import { CreatePresentResponseDto } from '../presents/dto/createPresent.response.dto';
+import customErrorCode from '../type/custom.error.code';
 
 @ApiTags('funds')
 @Controller('funds')
@@ -25,6 +34,7 @@ export class FundsController {
     description: '발급된 access-token',
     required: true,
   })
+  @ApiQuery({ name: 'page', type: Number, description: '페이지' })
   @ApiOkResponse({
     type: GetFundingHistoryReponseDto,
   })
@@ -44,9 +54,17 @@ export class FundsController {
   })
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  async getMyFundingHistory(@Req() request) {
+  async getMyFundingHistory(@Req() request, @Query() query) {
+    if (!query.page || typeof parseInt(query.page) !== 'number') {
+      throw new BadRequestException({
+        message: 'page는 number type이어야 합니다!',
+        code: customErrorCode.INVALID_QUERY,
+      });
+    }
+
     const fundingHistory = await this.fundsService.getFundingHistory(
       parseInt(request.userId),
+      parseInt(query.page),
     );
 
     return new GetFundingHistoryReponseDto(fundingHistory);
