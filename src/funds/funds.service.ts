@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { UserEntity } from '../entities/user.entity';
 import { CreateFundDAO } from '../type/type';
 import { ModelConverter } from '../type/model.converter';
+import { PresentsService } from '../presents/presents.service';
 
 @Injectable()
 export class FundsService {
@@ -20,6 +21,7 @@ export class FundsService {
     @InjectRepository(FundingEntity)
     private fundingRepository: Repository<FundingEntity>,
     private usersService: UsersService,
+    private presentsService: PresentsService,
     private dataSource: DataSource,
   ) {}
 
@@ -48,6 +50,41 @@ export class FundsService {
     });
   }
 
+  async findFund(
+    property: string,
+    value: string | number,
+    relations: string[] | null,
+  ): Promise<FundingEntity> {
+    const fund = await this.fundingRepository.findOne({
+      where: { [property]: value, deletedAt: null },
+      relations: relations,
+    });
+
+    if (!fund) {
+      throw new BadRequestException({
+        message: '존재하지 않는 펀딩 입니다!',
+        code: customErrorCode.FUNDING_NOT_FOUND,
+      });
+    }
+
+    return fund;
+  }
+
+  async findFunds(
+    property: string,
+    value: string | number,
+    relations: string[] | null,
+    skip: number,
+    take: number,
+  ) {
+    return this.fundingRepository.find({
+      where: { [property]: value, deletedAt: null },
+      relations: ['Present'],
+      skip: skip,
+      take: take,
+    });
+  }
+
   async Funding(
     userId: number,
     presentId: number,
@@ -55,26 +92,11 @@ export class FundsService {
   ) {
     const { cost } = data;
 
-    const user = await this.usersService.findUser('id', userId);
+    const user = await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
+    const present = await this.presentsService.findPresent('id', presentId, [
+      'User',
+    ]);
 
     if (present.deadline < new Date()) {
       throw new BadRequestException({
@@ -89,13 +111,7 @@ export class FundsService {
     await queryRunner.startTransaction();
 
     try {
-      const fund = await this.createFund(
-        data,
-        present,
-        user,
-        present.User,
-        queryRunner,
-      );
+      await this.createFund(data, present, user, present.User, queryRunner);
 
       const total_money = present.money + cost;
       let total_complete = present.complete;
@@ -126,23 +142,15 @@ export class FundsService {
   }
 
   async getFundingHistory(userId: number, page: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const fundingHistories = await this.fundingRepository.find({
-      where: { SenderId: userId, deletedAt: null },
-      skip: page * 10,
-      take: 10,
-      relations: ['Present'],
-    });
+    const fundingHistories = await this.findFunds(
+      'SenderId',
+      userId,
+      ['Present'],
+      page * 10,
+      10,
+    );
 
     if (fundingHistories.length === 0) return [];
 
@@ -155,52 +163,25 @@ export class FundsService {
   }
 
   async deleteFunding(userId: number, presentId: number, fundId: number) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
-
-    const fund = await this.fundingRepository.findOne({
-      where: { id: fundId, deletedAt: null },
-      relations: ['Sender'],
-    });
-
-    if (!fund) {
-      throw new BadRequestException({
-        message: '존재하지 않는 펀딩 입니다!',
-        code: customErrorCode.FUNDING_NOT_FOUND,
-      });
-    }
-
-    if (fund.Sender.id !== userId) {
-      throw new BadRequestException({
-        message: '내가 한 펀딩만 취소할 수 있습니다.',
-        code: customErrorCode.FUNDING_NOT_MINE,
-      });
-    }
+    const present = await this.presentsService.findPresent('id', presentId, [
+      'User',
+    ]);
 
     if (present.complete === true) {
       throw new BadRequestException({
         message: '완료된 펀딩에 대해서는 취소할 수 없습니다!',
         code: customErrorCode.FUNDING_ALREADY_COMPLETE,
+      });
+    }
+
+    const fund = await this.findFund('id', 'fundId', ['Sender']);
+
+    if (fund.Sender.id !== userId) {
+      throw new BadRequestException({
+        message: '내가 한 펀딩만 취소할 수 있습니다.',
+        code: customErrorCode.FUNDING_NOT_MINE,
       });
     }
 

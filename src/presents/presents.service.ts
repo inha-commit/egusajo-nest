@@ -9,7 +9,9 @@ import {
   CreatePresentDAO,
   CreatePresentResponse,
   DeletePresentResponse,
+  PresentWithFund,
   PresentWithUser,
+  UpdatePresentDAO,
   UpdatePresentResponse,
 } from '../type/type';
 import { FundingEntity } from '../entities/funding.entity';
@@ -33,6 +35,12 @@ export class PresentsService {
     private dataSource: DataSource,
   ) {}
 
+  /**
+   * 선물 생성하기
+   * @param user
+   * @param createPresentDAO
+   * @param queryRunner
+   */
   async createPresent(
     user: UserEntity,
     createPresentDAO: CreatePresentDAO,
@@ -46,14 +54,162 @@ export class PresentsService {
       representImage,
       shortComment,
       longComment,
+      presentImages,
     } = createPresentDAO;
 
-    if (!user) {
+    const present = await queryRunner.manager
+      .getRepository(PresentEntity)
+      .save({
+        name: name,
+        productLink: productLink,
+        complete: false,
+        goal: goal,
+        money: 0,
+        deadline: deadline,
+        representImage: representImage,
+        shortComment: shortComment,
+        longComment: longComment,
+        User: user,
+      });
+
+    await this.createPresentImages(present, presentImages, queryRunner);
+
+    return present;
+  }
+
+  /**
+   * 선물 이미지 생성하기
+   * @param present
+   * @param presentImages
+   * @param queryRunner
+   */
+  async createPresentImages(
+    present: PresentEntity,
+    presentImages: string[],
+    queryRunner: QueryRunner,
+  ): Promise<PresentImageEntity[]> {
+    return await Promise.all(
+      presentImages.map(async (presentImage) => {
+        return queryRunner.manager.getRepository(PresentImageEntity).save({
+          Present: present,
+          src: presentImage,
+        });
+      }),
+    );
+  }
+
+  /**
+   * 선물 가져오기
+   * @param property
+   * @param value
+   * @param relations
+   */
+  async findPresent(
+    property: string,
+    value: string | number,
+    relations: string[] | null,
+  ): Promise<PresentEntity> {
+    const present = await this.presentRepository.findOne({
+      where: { [property]: value, deletedAt: null },
+      relations: relations,
+    });
+
+    if (!present) {
       throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
+        message: '존재하지 않는 게시글 입니다!',
+        code: customErrorCode.PRESENT_NOT_FOUND,
       });
     }
+
+    return present;
+  }
+
+  /**
+   * 선물들 가져오기
+   * @param property
+   * @param value
+   * @param relations
+   * @param skip
+   * @param take
+   */
+  async findPresents(
+    property: string,
+    value: string | number,
+    relations: string[] | null,
+    skip: number,
+    take: number,
+  ): Promise<PresentEntity[]> {
+    return await this.presentRepository.find({
+      where: { [property]: value, deletedAt: null },
+      relations: relations,
+      skip: skip,
+      take: take,
+    });
+  }
+
+  async updatePresent(
+    user: UserEntity,
+    present: PresentEntity,
+    updatePresentDAO: UpdatePresentDAO,
+    queryRunner: QueryRunner,
+  ): Promise<void> {
+    const {
+      name,
+      productLink,
+      goal,
+      deadline,
+      presentImages,
+      representImage,
+      shortComment,
+      longComment,
+    } = updatePresentDAO;
+
+    await this.deletePresentImages(present.id, queryRunner);
+
+    present.name = name;
+    present.productLink = productLink;
+    present.goal = goal;
+    present.deadline = deadline;
+    present.representImage = representImage;
+    present.shortComment = shortComment;
+    present.longComment = longComment;
+    present.PresentImage = await this.createPresentImages(
+      present,
+      presentImages,
+      queryRunner,
+    );
+
+    await queryRunner.manager.getRepository(PresentEntity).save(present);
+  }
+
+  async deletePresentImages(
+    presentId: number,
+    queryRunner: QueryRunner,
+  ): Promise<void> {
+    await queryRunner.manager
+      .createQueryBuilder()
+      .delete()
+      .from(PresentImageEntity)
+      .where('PresentId = :presentId', { presentId: presentId })
+      .execute();
+  }
+
+  /**
+   * 선물 게시물 생성하기
+   * @param userId
+   * @param data
+   */
+  async createPresentPost(
+    userId: number,
+    data: CreatePresentRequestDto,
+  ): Promise<CreatePresentResponse> {
+    const { goal, deadline } = data;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const user = await this.usersService.findUser('id', userId, null);
 
     if (goal <= 0) {
       throw new BadRequestException({
@@ -72,70 +228,14 @@ export class PresentsService {
     // TODO: 올해 한개의 게시글만 작성하게 해야하나? 생일 기점 한달 전에만 올릴 수 있게
     // TODO: 펀딩은 선물 한개에 하나만 올릴 수 있게
 
-    return await queryRunner.manager.getRepository(PresentEntity).save({
-      name: name,
-      productLink: productLink,
-      complete: false,
-      goal: goal,
-      money: 0,
-      deadline: deadline,
-      representImage: representImage,
-      shortComment: shortComment,
-      longComment: longComment,
-      User: user,
-    });
-  }
-
-  async createPresentImages(
-    present: PresentEntity,
-    presentImages: string[],
-    queryRunner: QueryRunner,
-  ): Promise<void> {
-    await Promise.all(
-      presentImages.map(async (presentImage) => {
-        return queryRunner.manager.getRepository(PresentImageEntity).save({
-          Present: present,
-          src: presentImage,
-        });
-      }),
-    );
-  }
-
-  /**
-   * 선물 게시물 생성하기
-   * @param userId
-   * @param data
-   */
-  async createPresentPost(
-    userId: number,
-    data: CreatePresentRequestDto,
-  ): Promise<CreatePresentResponse> {
-    const { presentImages } = data;
-
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    const user = await this.usersService.findUser('id', userId);
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
     try {
-      const present = await this.createPresent(user, data, queryRunner);
-
-      await this.createPresentImages(present, presentImages, queryRunner);
+      await this.createPresent(user, data, queryRunner);
 
       await queryRunner.commitTransaction();
 
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
     } finally {
       await queryRunner.release();
     }
@@ -146,18 +246,11 @@ export class PresentsService {
    * @param userId
    * @param page
    */
-  async getPresents(userId: number, page: number): Promise<PresentWithUser[]> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-      relations: ['Followings'],
-    });
-
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
+  async getPresentPosts(
+    userId: number,
+    page: number,
+  ): Promise<PresentWithUser[]> {
+    const user = await this.usersService.findUser('id', userId, ['Followings']);
 
     const followingIds = user.Followings.map((following) => {
       if (following.deletedAt === null) {
@@ -194,36 +287,28 @@ export class PresentsService {
    * @param userId
    * @param presentId
    */
-  async getPresent(userId: number, presentId: number) {
-    const user = await this.usersService.findUser('id', userId);
+  async getPresentPost(
+    userId: number,
+    presentId: number,
+  ): Promise<PresentWithFund> {
+    await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['User', 'PresentImage', 'Funding', 'Funding.Sender'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
+    const present = await this.findPresent('id', presentId, [
+      'User',
+      'PresentImage',
+      'Funding',
+      'Funding.Sender',
+    ]);
 
     // 대표이미지 빼고 보내기
-    const presentImages = [];
+    const presentImages: string[] = [];
     present.PresentImage.filter(
       (presentImage) => presentImage.src !== present.representImage,
     ).map((presentImage) => {
       presentImages.push(presentImage.src);
     });
 
+    // 내가 펀딩에 참여했는지 확인
     let isParticipate = false;
 
     const fundings = present.Funding.map((funding) => {
@@ -246,25 +331,24 @@ export class PresentsService {
     };
   }
 
-  async getMyPresents(
+  /**
+   * 나의 선물 게시물 가져오기
+   * @param userId
+   * @param page
+   */
+  async getMyPresentPosts(
     userId: number,
     page: number,
   ): Promise<PresentWithUser[]> {
-    const user = await this.usersService.findUser('id', userId);
+    await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const presents = await this.presentRepository.find({
-      where: { UserId: userId, deletedAt: null },
-      skip: page * 10,
-      take: 10,
-      relations: ['User'],
-    });
+    const presents = await this.findPresents(
+      'UserId',
+      userId,
+      ['User'],
+      page * 10,
+      10,
+    );
 
     if (presents.length === 0) return [];
 
@@ -282,44 +366,19 @@ export class PresentsService {
    * @param presentId
    * @param data
    */
-  async updatePresent(
+  async updatePresentPost(
     userId: number,
     presentId: number,
     data: UpdatePresentRequestDto,
   ): Promise<UpdatePresentResponse> {
-    const {
-      name,
-      productLink,
-      goal,
-      deadline,
-      presentImages,
-      representImage,
-      shortComment,
-      longComment,
-    } = data;
+    const { goal, deadline } = data;
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId, deletedAt: null },
-    });
+    const user = await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['PresentImage', 'User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
+    const present = await this.findPresent('id', presentId, [
+      'PresentImage',
+      'User',
+    ]);
 
     if (present.User.id !== user.id) {
       throw new BadRequestException({
@@ -347,41 +406,13 @@ export class PresentsService {
     await queryRunner.startTransaction();
 
     try {
-      // 기존의 이미지 삭제
-      await queryRunner.manager
-        .createQueryBuilder()
-        .delete()
-        .from(PresentImageEntity)
-        .where('PresentId = :presentId', { presentId: present.id })
-        .execute();
-
-      // present 업데이트
-      present.name = name;
-      present.productLink = productLink;
-      present.goal = goal;
-      present.deadline = deadline;
-      present.representImage = representImage;
-      present.shortComment = shortComment;
-      present.longComment = longComment;
-
-      // presentImage도 업데이트
-      present.PresentImage = await Promise.all(
-        presentImages.map(async (presentImage) => {
-          return queryRunner.manager.getRepository(PresentImageEntity).save({
-            Present: present,
-            src: presentImage,
-          });
-        }),
-      );
-
-      await queryRunner.manager.getRepository(PresentEntity).save(present);
+      await this.updatePresent(user, present, data, queryRunner);
 
       await queryRunner.commitTransaction();
 
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      // TODO: 여기에 internal server error
     } finally {
       await queryRunner.release();
     }
@@ -396,30 +427,13 @@ export class PresentsService {
     userId: number,
     presentId: number,
   ): Promise<DeletePresentResponse> {
-    const user = await this.usersService.findUser('id', userId);
+    const user = await this.usersService.findUser('id', userId, null);
 
-    if (!user) {
-      throw new BadRequestException({
-        message: '회원가입 되지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_AUTHENTICATED,
-      });
-    }
-
-    const present = await this.presentRepository.findOne({
-      where: { id: presentId, deletedAt: null },
-      relations: ['PresentImage', 'User'],
-    });
-
-    if (!present) {
-      throw new BadRequestException({
-        message: '존재하지 않는 게시글 입니다!',
-        code: customErrorCode.PRESENT_NOT_FOUND,
-      });
-    }
+    const present = await this.findPresent('id', presentId, ['User']);
 
     if (present.User.id !== user.id) {
       throw new BadRequestException({
-        message: '자신의 게시물만 수정할 수 있습니다',
+        message: '자신의 게시물만 삭제할 수 있습니다',
         code: customErrorCode.PRESENT_NOT_MINE,
       });
     }
