@@ -22,12 +22,12 @@ export default class UserSeeder implements Seeder {
     const fundingFactory = factoryManager.get(FundingEntity);
     const presentImageFactory = factoryManager.get(PresentImageEntity);
 
-    const users = await userFactory.saveMany(99);
+    const users = await userFactory.saveMany(200);
 
     // 100번 유저에 대해 모든 유저 팔로우하기
     const followings = [];
     await (async () => {
-      for (let i = 2; i < 100; i++) {
+      for (let i = 2; i < 10; i++) {
         const follow = await followFactory.make({
           followingId: i,
           followerId: 1,
@@ -40,7 +40,7 @@ export default class UserSeeder implements Seeder {
 
     const followers = [];
     await (async () => {
-      for (let i = 2; i < 100; i++) {
+      for (let i = 5; i < 15; i++) {
         const follow = await followFactory.make({
           followingId: 1,
           followerId: i,
