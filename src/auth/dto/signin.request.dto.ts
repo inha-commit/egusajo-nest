@@ -9,4 +9,10 @@ export class SigninRequestDto {
   @Transform((value) => value.toString())
   @IsString()
   readonly snsId: string;
+
+  @ApiProperty({
+    description: 'fcmId',
+  })
+  @IsString()
+  readonly fcmId: string;
 }

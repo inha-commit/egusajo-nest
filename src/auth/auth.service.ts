@@ -24,12 +24,14 @@ export class AuthService {
    * @param data
    */
   async signIn(data: SigninRequestDto): Promise<Tokens> {
-    const { snsId } = data;
+    const { snsId, fcmId } = data;
 
     const user = await this.usersService.findUser('snsId', snsId, null);
 
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
+
+    // TODO: 여기 redis에 user fcmId 저장
 
     return { accessToken, refreshToken };
   }
