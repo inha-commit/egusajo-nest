@@ -46,18 +46,6 @@ export class UpdateMyInfoRequestDto {
   readonly account: string;
 
   @ApiProperty({
-    description: '사용자 은행',
-  })
-  @IsString()
-  readonly bank: string;
-
-  @ApiProperty({
-    description: '사용자 계좌번호',
-  })
-  @IsString()
-  readonly account: string;
-
-  @ApiProperty({
     name: 'profileImgSsrc',
     description:
       '프로필 이미지 저장소 주소를 보내주세요, 프로필 이미지 설정을 하지 않았다면 서버에서 기본이미지로 설정할테니 null로 보내주세요 ',
