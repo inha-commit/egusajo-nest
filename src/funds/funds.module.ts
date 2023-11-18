@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { PresentsService } from './presents.service';
-import { PresentsController } from './presents.controller';
+import { FundsController } from './funds.controller';
+import { FundsService } from './funds.service';
+import { UsersService } from '../users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { PresentEntity } from '../entities/present.entity';
 import { PresentImageEntity } from '../entities/presentImage.entity';
-import { JwtService } from '@nestjs/jwt';
 import { FundingEntity } from '../entities/funding.entity';
-import { UsersService } from '../users/users.service';
-import { FundsService } from '../funds/funds.service';
 
 @Module({
   imports: [
@@ -19,7 +17,7 @@ import { FundsService } from '../funds/funds.service';
       FundingEntity,
     ]),
   ],
-  controllers: [PresentsController],
-  providers: [PresentsService, FundsService, UsersService, JwtService],
+  controllers: [FundsController],
+  providers: [FundsService, UsersService],
 })
-export class PresentsModule {}
+export class FundsModule {}

@@ -123,6 +123,12 @@ type PresentImage = {
   src: string;
 };
 
+// Fund
+type CreateFundDAO = {
+  cost: number;
+  comment: string;
+};
+
 export type {
   AccessToken,
   Tokens,
@@ -141,4 +147,5 @@ export type {
   UpdatePresentResponse,
   DeletePresentResponse,
   PresentImage,
+  CreateFundDAO,
 };

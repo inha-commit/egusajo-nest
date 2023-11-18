@@ -219,6 +219,13 @@ export class GetPresentResponseDto {
   readonly present: Present;
 
   @ApiProperty({
+    name: 'isParticipate',
+    type: Boolean,
+    description: '내가 해당 선물에 펀딩 했는지 정보',
+  })
+  readonly isParticipate: boolean;
+
+  @ApiProperty({
     name: 'presentImages',
     type: [String],
     description: '선물 이미지들',
@@ -237,5 +244,6 @@ export class GetPresentResponseDto {
     this.present = new Present(obj.present);
     this.presentImages = obj.presentImages;
     this.fundings = obj.fundings.map((funding) => new FundingWithUser(funding));
+    this.isParticipate = obj.isParticipate;
   }
 }

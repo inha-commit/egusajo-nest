@@ -32,11 +32,15 @@ import { CreateFundingRequestDto } from './dto/createFunding.request.dto';
 import { GetPresentResponseDto } from './dto/getPresent.response.dto';
 import { CreateFundingResponseDto } from './dto/createFunding.response.dto';
 import { GetPresentsResponseDto } from './dto/getPresents.response.dto';
+import { FundsService } from '../funds/funds.service';
 
 @ApiTags('presents')
 @Controller('presents')
 export class PresentsController {
-  constructor(private presentsService: PresentsService) {}
+  constructor(
+    private presentsService: PresentsService,
+    private fundsService: FundsService,
+  ) {}
 
   @ApiOperation({
     summary: '선물 게시물 생성하기',
@@ -549,7 +553,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.presentsService.createFunding(
+    const response = await this.fundsService.Funding(
       request.userId,
       parseInt(presentId),
       data,
@@ -581,7 +585,7 @@ export class PresentsController {
       });
     }
 
-    await this.presentsService.deleteFunding(
+    await this.fundsService.deleteFunding(
       request.userId,
       parseInt(presentId),
       parseInt(fundId),
