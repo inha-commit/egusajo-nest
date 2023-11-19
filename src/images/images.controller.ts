@@ -51,7 +51,13 @@ export class ImagesController {
     },
   })
   @Post('/')
-  @UseInterceptors(FilesInterceptor('images', 10))
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+    }),
+  )
   async uploadUserImages(
     @UploadedFiles() files: Express.MulterS3.File[],
     @Query('type') type: string,

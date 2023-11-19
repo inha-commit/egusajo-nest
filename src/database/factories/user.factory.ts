@@ -17,7 +17,6 @@ export default setSeederFactory(UserEntity, (faker) => {
   user.bank = 'Hana';
   user.account = faker.finance.accountNumber();
   user.profileImgSrc = faker.image.avatar();
-  user.fcmId = faker.string.uuid();
   user.alarm = true;
 
   return user;

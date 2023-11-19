@@ -7,6 +7,8 @@ import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 import { UsersService } from '../users/users.service';
+import Redis from 'ioredis';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     this.slackClient = new SlackApiClient();
   }
@@ -24,12 +27,14 @@ export class AuthService {
    * @param data
    */
   async signIn(data: SigninRequestDto): Promise<Tokens> {
-    const { snsId } = data;
+    const { snsId, fcmId } = data;
 
     const user = await this.usersService.findUser('snsId', snsId, null);
 
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
+
+    await this.saveRedisFcmToken(user.id, fcmId);
 
     return { accessToken, refreshToken };
   }
@@ -49,16 +54,6 @@ export class AuthService {
         code: customErrorCode.USER_ALREADY_EXIST,
       });
     }
-
-    const fcmIdExist = await this.usersService.validateUser('fcmId', fcmId);
-
-    if (fcmIdExist) {
-      throw new BadRequestException({
-        message: '이미 가입된 유저입니다!',
-        code: customErrorCode.USER_ALREADY_EXIST,
-      });
-    }
-
     const nicknameExist = await this.usersService.validateUser(
       'nickname',
       nickname,
@@ -72,6 +67,8 @@ export class AuthService {
     }
 
     const user = await this.usersService.createUser(data);
+
+    await this.saveRedisFcmToken(user.id, fcmId);
 
     await this.slackClient.newUser();
 
@@ -102,6 +99,19 @@ export class AuthService {
     }
 
     return { success: true };
+  }
+
+  /**
+   * fcmToken redis에 저장
+   * @param userId
+   * @param fcmToken
+   */
+  async saveRedisFcmToken(userId: number, fcmToken: string): Promise<void> {
+    await this.redis.set(userId.toString(), fcmToken);
+  }
+
+  async getFcmToken(userId: number): Promise<string> {
+    return this.redis.get(userId.toString());
   }
 
   /**

@@ -15,7 +15,6 @@ export class ModelConverter {
       profileImgSrc: user.profileImgSrc,
       bank: user.bank,
       account: user.account,
-      fcmId: user.fcmId,
       alarm: user.alarm,
     };
   }

@@ -26,7 +26,6 @@ type User = {
   bank: string;
   account: string;
   profileImgSrc: string;
-  fcmId: string;
   alarm: boolean;
 };
 
@@ -38,7 +37,6 @@ type CreateUserDAO = {
   bank: string;
   account: string;
   profileImgSrc: string;
-  fcmId: string;
 };
 
 type UpdateUserDAO = {
@@ -62,7 +60,6 @@ type Follower = {
   nickname: string;
   birthday: Date;
   profileImgSrc: string;
-  fcmId: string;
   alarm: boolean;
   isFollowing: boolean;
 };

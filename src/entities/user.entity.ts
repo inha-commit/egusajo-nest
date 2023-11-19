@@ -48,8 +48,8 @@ export class UserEntity {
   profileImgSrc: string;
 
   // fcm 알림 받을 고유 id
-  @Column('varchar', { unique: true })
-  fcmId: string;
+  // @Column('varchar')
+  // fcmId: string;
 
   // 알람 수신 여부
   @Column('boolean', { default: true })

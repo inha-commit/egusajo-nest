@@ -74,7 +74,7 @@ describe('UsersService', () => {
         snsId: 'test_snsId',
         name: 'test_name',
         nickname: 'test_nickname',
-        birthday: '19980914',
+        birthday: new Date(),
         bank: 'test_bank',
         account: 'test_account',
         fcmId: 'basic.png',
@@ -86,7 +86,7 @@ describe('UsersService', () => {
         snsId: 'test_snsId',
         nickname: 'test_nickname',
         name: '김민우',
-        birthday: '19980914',
+        birthday: new Date(),
         bank: 'test_bank',
         account: 'test_account',
         profileImgSrc: 'basic.png',
@@ -117,7 +117,7 @@ describe('UsersService', () => {
         deletedAt: null,
       };
 
-      await expect(usersService.findUser('id', 1)).resolves.toStrictEqual(
+      await expect(usersService.findUser('id', 1, null)).resolves.toStrictEqual(
         response,
       );
     });
@@ -138,7 +138,7 @@ describe('UsersService', () => {
       };
 
       await expect(
-        usersService.findUser('snsId', 'test_snsId'),
+        usersService.findUser('snsId', 'test_snsId', null),
       ).resolves.toStrictEqual(response);
     });
 
@@ -158,7 +158,7 @@ describe('UsersService', () => {
       };
 
       await expect(
-        usersService.findUser('nickname', 'test_nickname'),
+        usersService.findUser('nickname', 'test_nickname', null),
       ).resolves.toStrictEqual(response);
     });
 
@@ -178,7 +178,7 @@ describe('UsersService', () => {
       };
 
       await expect(
-        usersService.findUser('fcmId', 'test_fcmId'),
+        usersService.findUser('fcmId', 'test_fcmId', null),
       ).resolves.toStrictEqual(response);
     });
   });
@@ -214,7 +214,7 @@ describe('UsersService', () => {
         snsId: 'test_snsId',
         nickname: 'test_nickname',
         name: '김민우',
-        birthday: '19980914',
+        birthday: new Date(),
         bank: 'test_bank',
         account: 'test_account',
         profileImgSrc: 'basic.png',
