@@ -14,9 +14,6 @@ class Redis {
   constructor() {
     this.client = createClient({
       url: process.env.REDIS_URL,
-      socket: {
-        tls: true,
-      },
     });
 
     this.client.on('connect', () => {
