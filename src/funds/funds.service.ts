@@ -12,10 +12,12 @@ import { ModelConverter } from '../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
 import { FcmApiClient } from '../utils/fcm.api.client';
 import { AuthService } from '../auth/auth.service';
+import Redis from '../utils/redis.client';
 
 @Injectable()
 export class FundsService {
   private fcmApiClient: FcmApiClient;
+  private redis: any;
 
   constructor(
     @InjectRepository(UserEntity)
@@ -30,6 +32,8 @@ export class FundsService {
     private dataSource: DataSource,
   ) {
     this.fcmApiClient = new FcmApiClient();
+
+    this.redis = Redis.getInstance().getClient();
   }
 
   async createFund(

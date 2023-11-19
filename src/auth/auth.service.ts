@@ -7,19 +7,19 @@ import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 import { UsersService } from '../users/users.service';
-import Redis from 'ioredis';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from '../utils/redis.client';
 
 @Injectable()
 export class AuthService {
   private slackClient: SlackApiClient;
+  private redis: any;
 
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    @InjectRedis() private readonly redis: Redis,
   ) {
     this.slackClient = new SlackApiClient();
+    this.redis = Redis.getInstance().getClient();
   }
 
   /**
