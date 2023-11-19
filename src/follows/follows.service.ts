@@ -1,6 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Follower, FollowResponse, UnFollowResponse, User } from '../type/type';
-import customErrorCode from '../type/custom.error.code';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { Repository } from 'typeorm';
@@ -55,8 +54,23 @@ export class FollowsService {
     // 팔로우 할 사람
     const follower = await this.usersService.findUser('id', followingId, null);
 
-    // TODO: 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
-    const fcmToken = await this.authService.getFcmToken(userId);
+    const fcmToken = await this.authService.getFcmToken(follower.id);
+
+    if (fcmToken && follower.alarm) {
+      const isFollow = await this.followRepository.findOne({
+        where: {
+          followingId: user.id,
+          followerId: follower.id,
+        },
+      });
+
+      // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
+      if (isFollow) {
+        this.fcmApiClient.followAcceptMessage(user.nickname, fcmToken);
+      } else {
+        this.fcmApiClient.newFollowerMessage(user.nickname, fcmToken);
+      }
+    }
 
     await this.createFollow(follower, user);
 
@@ -83,13 +97,22 @@ export class FollowsService {
       null,
     );
 
-    // TODO: 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
+    const fcmToken = await this.authService.getFcmToken(follower.id);
 
-    if (!follower) {
-      throw new BadRequestException({
-        message: '존재하지 않은 유저입니다!',
-        code: customErrorCode.USER_NOT_FOUND,
+    if (fcmToken && user.alarm) {
+      const isFollow = await this.followRepository.findOne({
+        where: {
+          followingId: user.id,
+          followerId: follower.id,
+        },
       });
+
+      // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
+      if (isFollow) {
+        this.fcmApiClient.followAcceptMessage(user.nickname, fcmToken);
+      } else {
+        this.fcmApiClient.newFollowerMessage(user.nickname, fcmToken);
+      }
     }
 
     await this.createFollow(follower, user);

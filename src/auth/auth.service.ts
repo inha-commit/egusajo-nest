@@ -34,7 +34,7 @@ export class AuthService {
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
 
-    await this.saveRedisFcmToken(user.id, user.fcmId);
+    await this.saveRedisFcmToken(user.id, fcmId);
 
     return { accessToken, refreshToken };
   }
@@ -54,16 +54,6 @@ export class AuthService {
         code: customErrorCode.USER_ALREADY_EXIST,
       });
     }
-
-    const fcmIdExist = await this.usersService.validateUser('fcmId', fcmId);
-
-    if (fcmIdExist) {
-      throw new BadRequestException({
-        message: '이미 가입된 유저입니다!',
-        code: customErrorCode.USER_ALREADY_EXIST,
-      });
-    }
-
     const nicknameExist = await this.usersService.validateUser(
       'nickname',
       nickname,
@@ -78,7 +68,7 @@ export class AuthService {
 
     const user = await this.usersService.createUser(data);
 
-    await this.saveRedisFcmToken(user.id, user.fcmId);
+    await this.saveRedisFcmToken(user.id, fcmId);
 
     await this.slackClient.newUser();
 

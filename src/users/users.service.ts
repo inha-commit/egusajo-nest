@@ -25,16 +25,8 @@ export class UsersService {
    * @param createUserDAO
    */
   async createUser(createUserDAO: CreateUserDAO): Promise<User> {
-    const {
-      snsId,
-      name,
-      nickname,
-      birthday,
-      bank,
-      account,
-      fcmId,
-      profileImgSrc,
-    } = createUserDAO;
+    const { snsId, name, nickname, birthday, bank, account, profileImgSrc } =
+      createUserDAO;
 
     const newUser = new UserEntity();
     newUser.snsId = snsId;
@@ -42,11 +34,14 @@ export class UsersService {
     newUser.nickname = nickname;
     newUser.bank = bank;
     newUser.account = account;
-    newUser.fcmId = fcmId;
     newUser.birthday = birthday;
-    newUser.profileImgSrc =
-      profileImgSrc === null ? 'basic.png' : profileImgSrc;
     newUser.alarm = true;
+
+    if (!profileImgSrc) {
+      newUser.profileImgSrc = process.env.BASIC_PROFILE_IMAGE_SRC;
+    } else {
+      newUser.profileImgSrc = profileImgSrc;
+    }
 
     return await this.userRepository.save(newUser);
   }
@@ -107,8 +102,13 @@ export class UsersService {
     user.birthday = birthday;
     user.bank = bank;
     user.account = account;
-    user.profileImgSrc = profileImgSrc === null ? 'basic.png' : profileImgSrc;
     user.alarm = alarm;
+
+    if (!profileImgSrc) {
+      user.profileImgSrc = process.env.BASIC_PROFILE_IMAGE_SRC;
+    } else {
+      user.profileImgSrc = profileImgSrc;
+    }
 
     return await this.userRepository.save(user);
   }
@@ -119,7 +119,7 @@ export class UsersService {
    * @param value
    */
   async deleteUser(property: string, value: string | number): Promise<void> {
-    await this.userRepository.softDelete({ [property]: value });
+    await this.userRepository.delete({ [property]: value });
   }
 
   /**

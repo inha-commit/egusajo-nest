@@ -11,6 +11,7 @@ import { CreateFundDAO } from '../type/type';
 import { ModelConverter } from '../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
 import { FcmApiClient } from '../utils/fcm.api.client';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class FundsService {
@@ -23,6 +24,7 @@ export class FundsService {
     private presentRepository: Repository<PresentEntity>,
     @InjectRepository(FundingEntity)
     private fundingRepository: Repository<FundingEntity>,
+    private authService: AuthService,
     private usersService: UsersService,
     private presentsService: PresentsService,
     private dataSource: DataSource,
@@ -131,9 +133,17 @@ export class FundsService {
       // TODO: 이 부분 update 코드로 변경
       await queryRunner.manager.getRepository(PresentEntity).save(present);
 
-      // TODO: 여기서 완료된 펀딩에는 조치를 취해야 함
+      // 펀딩 받은 사람에게 알람 보내기
+      const fcmToken = await this.authService.getFcmToken(present.User.id);
 
-      // TODO: 여기서 펀딩받은 사람에게 알림 보내기
+      if (fcmToken && present.User.alarm) {
+        this.fcmApiClient.newFundingMessage(user.nickname, cost, fcmToken);
+      }
+
+      // 완료된 사람에게 알람 보내기
+      if (total_complete && fcmToken && present.User.alarm) {
+        this.fcmApiClient.completeFundingMessage(fcmToken);
+      }
 
       await queryRunner.commitTransaction();
 

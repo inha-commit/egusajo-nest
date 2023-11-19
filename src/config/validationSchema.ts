@@ -9,6 +9,9 @@ export const validationSchema = Joi.object({
 
   REDIS_HOST: Joi.string().required(),
   REDIS_PORT: Joi.string().required(),
+  REDIS_PASSWORD: Joi.string().required(),
+
+  BASIC_PROFILE_IMAGE_SRC: Joi.string().required(),
 
   JWT_SECRET: Joi.string().required(),
   ACCESS_TOKEN_EXPIRE: Joi.string().required(),
@@ -23,4 +26,16 @@ export const validationSchema = Joi.object({
   SLACK_NEW_USER_CHANNEL_ID: Joi.string().required(),
   SLACK_API_LATENCY_CHANNEL_ID: Joi.string().required(),
   SLACK_FATAL_ERROR_CHANNEL_ID: Joi.string().required(),
+
+  FCM_CREDENTIAL_TYPE: Joi.string().required(),
+  FCM_CREDENTIAL_PROJECT_ID: Joi.string().required(),
+  FCM_CREDENTIAL_PRIVATE_KEY_ID: Joi.string().required(),
+  FCM_CREDENTIAL_CLIENT_EMAIL: Joi.string().required(),
+  FCM_CREDENTIAL_CLIENT_ID: Joi.string().required(),
+  FCM_CREDENTIAL_AUTH_URI: Joi.string().required(),
+  FCM_CREDENTIAL_TOKEN_URI: Joi.string().required(),
+  FCM_CREDENTIAL_AUTH_PROVIDER_CERT_URL: Joi.string().required(),
+  FCM_CREDENTIAL_CLIENT_CERT_URL: Joi.string().required(),
+  FCM_CREDENTIAL_UNIVERSE_DOMAIN: Joi.string().required(),
+  FCM_CREDENTIAL_PRIVATE_KEY: Joi.string().required(),
 });

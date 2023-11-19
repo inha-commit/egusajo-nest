@@ -31,50 +31,74 @@ export class FcmApiClient {
     money: number,
     fcmToken: string,
   ) {
-    const message = {
-      data: {
-        title: '펀딩 도착 알림',
-        body: `${senderNickname}님이 ${money}원을 펀딩해 주셨어요!`,
-      },
-      token: fcmToken,
-    };
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        const message = {
+          data: {
+            title: '펀딩 도착 알림',
+            body: `${senderNickname}님이 ${money}원을 펀딩해 주셨어요!`,
+          },
+          token: fcmToken,
+        };
 
-    await this.admin.messaging().send(message);
+        await this.admin.messaging().send(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async completeFundingMessage(fcmToken: string) {
-    const message = {
-      data: {
-        title: '펀딩 마감 알림',
-        body: `펀딩이 마감되었어요!`,
-      },
-      token: fcmToken,
-    };
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        const message = {
+          data: {
+            title: '펀딩 마감 알림',
+            body: `펀딩이 마감되었어요!`,
+          },
+          token: fcmToken,
+        };
 
-    await this.admin.messaging().send(message);
+        await this.admin.messaging().send(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async newFollowerMessage(userNickname: string, fcmToken: string) {
-    const message = {
-      data: {
-        title: '친구 요청 알림',
-        body: `${userNickname}님이 친구가 되고 싶어해요`,
-      },
-      token: fcmToken,
-    };
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        const message = {
+          data: {
+            title: '친구 요청 알림',
+            body: `${userNickname}님이 친구가 되고 싶어해요`,
+          },
+          token: fcmToken,
+        };
 
-    await this.admin.messaging().send(message);
+        await this.admin.messaging().send(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async followAcceptMessage(userNickname: string, fcmToken: string) {
-    const message = {
-      data: {
-        title: '친구 요청 수락 알림',
-        body: `${userNickname}님과 친구가 되었어요!`,
-      },
-      token: fcmToken,
-    };
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        const message = {
+          data: {
+            title: '친구 요청 수락 알림',
+            body: `${userNickname}님과 친구가 되었어요!`,
+          },
+          token: fcmToken,
+        };
 
-    await this.admin.messaging().send(message);
+        await this.admin.messaging().send(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

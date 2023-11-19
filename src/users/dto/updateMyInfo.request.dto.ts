@@ -28,8 +28,6 @@ export class UpdateMyInfoRequestDto {
     description: 'YYYY/MM/DD 형식으로 보내주세요',
   })
   @IsString()
-  @MinLength(8)
-  @MaxLength(8)
   @Transform(({ value }) => new Date(value), { toClassOnly: true })
   public birthday: Date;
 

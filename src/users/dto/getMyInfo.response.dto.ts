@@ -39,12 +39,6 @@ export class GetMyInfoResponseDto {
   public profileImgSrc: string;
 
   @ApiProperty({
-    name: 'fcmId',
-    description: '사용자 fcmId',
-  })
-  public fcmId: string;
-
-  @ApiProperty({
     name: 'alarm',
     description: '알람 수신 여부',
   })
@@ -68,7 +62,6 @@ export class GetMyInfoResponseDto {
     this.bank = obj.bank;
     this.account = obj.account;
     this.profileImgSrc = obj.profileImgSrc;
-    this.fcmId = obj.fcmId;
     this.alarm = obj.alarm;
   }
 }
