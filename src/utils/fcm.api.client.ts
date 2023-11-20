@@ -11,6 +11,8 @@ export class FcmApiClient {
   constructor() {
     this.logger = new Logger();
 
+    const { privateKey } = JSON.parse(process.env.FCM_CREDENTIAL_PRIVATE_KEY);
+
     this.credential = {
       type: process.env.FCM_CREDENTIAL_TYPE,
       project_id: process.env.FCM_CREDENTIAL_PROJECT_ID,
@@ -23,7 +25,7 @@ export class FcmApiClient {
         process.env.FCM_CREDENTIAL_AUTH_PROVIDER_CERT_URL,
       client_x509_cert_url: process.env.FCM_CREDENTIAL_CLIENT_CERT_URL,
       universe_domain: process.env.FCM_CREDENTIAL_UNIVERSE_DOMAIN,
-      private_key: process.env.FCM_CREDENTIAL_PRIVATE_KEY,
+      private_key: privateKey,
     };
     if (admin.apps.length === 0) {
       this.admin = admin.initializeApp({
@@ -95,7 +97,7 @@ export class FcmApiClient {
 
   async followAcceptMessage(userNickname: string, fcmToken: string) {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         const message = {
           data: {
             title: '친구 요청 수락 알림',
