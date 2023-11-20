@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import { Logger } from '@nestjs/common';
-import firebaseConfig from './firebase.config.json';
+import firebaseConfig from './filebaseConfig/firebase.config.json';
 
 export class FcmApiClient {
   private admin: admin.app.App;
