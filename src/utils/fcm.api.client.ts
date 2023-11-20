@@ -1,14 +1,18 @@
 import admin from 'firebase-admin';
+import { Logger } from '@nestjs/common';
+import firebaseConfig from './firebase.config.json';
 
 export class FcmApiClient {
   private admin: admin.app.App;
+
   private credential;
 
-  constructor() {
-    let firebaseConfig;
-    try {
-      firebaseConfig = require('./firebase.config.json');
+  private readonly logger: Logger;
 
+  constructor() {
+    this.logger = new Logger();
+
+    try {
       this.credential = {
         type: firebaseConfig.type,
         project_id: firebaseConfig.project_id,
@@ -29,8 +33,7 @@ export class FcmApiClient {
         });
       }
     } catch (error) {
-      // 파일이 없는 경우 에러가 발생할 것이므로, 에러를 무시하고 빈 객체로 초기화합니다.
-      firebaseConfig = {};
+      this.logger.error('Firebase key error');
     }
   }
 
@@ -45,6 +48,7 @@ export class FcmApiClient {
           data: {
             title: '펀딩 도착 알림',
             body: `${senderNickname}님이 ${money}원을 펀딩해 주셨어요!`,
+            code: 'fund',
           },
           token: fcmToken,
         };
@@ -63,6 +67,7 @@ export class FcmApiClient {
           data: {
             title: '펀딩 마감 알림',
             body: `펀딩이 마감되었어요!`,
+            code: 'complete',
           },
           token: fcmToken,
         };
@@ -81,6 +86,7 @@ export class FcmApiClient {
           data: {
             title: '친구 요청 알림',
             body: `${userNickname}님이 친구가 되고 싶어해요`,
+            code: 'follow',
           },
           token: fcmToken,
         };
@@ -99,6 +105,7 @@ export class FcmApiClient {
           data: {
             title: '친구 요청 수락 알림',
             body: `${userNickname}님과 친구가 되었어요!`,
+            code: 'accept',
           },
           token: fcmToken,
         };

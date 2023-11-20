@@ -1,8 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
-import dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
-
-dotenv.config();
 
 class Redis {
   private static instance: Redis;
