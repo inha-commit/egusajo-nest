@@ -55,10 +55,8 @@ export class FollowsService {
     const follower = await this.usersService.findUser('id', followingId, null);
 
     const fcmToken = await this.authService.getFcmToken(follower.id);
-    console.log(fcmToken);
 
     if (fcmToken && follower.alarm) {
-      console.log(fcmToken);
       const isFollow = await this.followRepository.findOne({
         where: {
           followingId: user.id,
@@ -100,10 +98,8 @@ export class FollowsService {
     );
 
     const fcmToken = await this.authService.getFcmToken(follower.id);
-    console.log(fcmToken);
 
     if (fcmToken && user.alarm) {
-      console.log(fcmToken);
       const isFollow = await this.followRepository.findOne({
         where: {
           followingId: user.id,
