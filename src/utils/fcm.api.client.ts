@@ -1,6 +1,5 @@
 import admin from 'firebase-admin';
 import { Logger } from '@nestjs/common';
-import firebaseConfig from './firebaseConfig/firebase.config.json';
 
 export class FcmApiClient {
   private admin: admin.app.App;
@@ -12,28 +11,24 @@ export class FcmApiClient {
   constructor() {
     this.logger = new Logger();
 
-    try {
-      this.credential = {
-        type: firebaseConfig.type,
-        project_id: firebaseConfig.project_id,
-        private_key_id: firebaseConfig.private_key_id,
-        private_key: firebaseConfig.private_key,
-        client_email: firebaseConfig.client_email,
-        client_id: firebaseConfig.client_id,
-        auth_uri: firebaseConfig.auth_uri,
-        token_uri: firebaseConfig.token_uri,
-        auth_provider_x509_cert_url: firebaseConfig.auth_provider_x509_cert_url,
-        client_x509_cert_url: firebaseConfig.client_x509_cert_url,
-        universe_domain: firebaseConfig.universe_domain,
-      };
-
-      if (admin.apps.length === 0) {
-        this.admin = admin.initializeApp({
-          credential: admin.credential.cert(this.credential as unknown),
-        });
-      }
-    } catch (error) {
-      this.logger.error('Firebase key error');
+    this.credential = {
+      type: process.env.FCM_CREDENTIAL_TYPE,
+      project_id: process.env.FCM_CREDENTIAL_PROJECT_ID,
+      private_key_id: process.env.FCM_CREDENTIAL_PRIVATE_KEY_ID,
+      client_email: process.env.FCM_CREDENTIAL_CLIENT_EMAIL,
+      client_id: process.env.FCM_CREDENTIAL_CLIENT_ID,
+      auth_uri: process.env.FCM_CREDENTIAL_AUTH_URI,
+      token_uri: process.env.FCM_CREDENTIAL_TOKEN_URI,
+      auth_provider_x509_cert_url:
+        process.env.FCM_CREDENTIAL_AUTH_PROVIDER_CERT_URL,
+      client_x509_cert_url: process.env.FCM_CREDENTIAL_CLIENT_CERT_URL,
+      universe_domain: process.env.FCM_CREDENTIAL_UNIVERSE_DOMAIN,
+      private_key: process.env.FCM_CREDENTIAL_PRIVATE_KEY,
+    };
+    if (admin.apps.length === 0) {
+      this.admin = admin.initializeApp({
+        credential: admin.credential.cert(this.credential as unknown),
+      });
     }
   }
 
@@ -56,7 +51,7 @@ export class FcmApiClient {
         await this.admin.messaging().send(message);
       }
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     }
   }
 
@@ -75,7 +70,7 @@ export class FcmApiClient {
         await this.admin.messaging().send(message);
       }
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     }
   }
 
@@ -94,13 +89,13 @@ export class FcmApiClient {
         await this.admin.messaging().send(message);
       }
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     }
   }
 
   async followAcceptMessage(userNickname: string, fcmToken: string) {
     try {
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV === 'development') {
         const message = {
           data: {
             title: '친구 요청 수락 알림',
@@ -113,7 +108,7 @@ export class FcmApiClient {
         await this.admin.messaging().send(message);
       }
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     }
   }
 }
