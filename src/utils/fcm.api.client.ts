@@ -1,28 +1,36 @@
 import admin from 'firebase-admin';
-import * as firebaseConfig from './firebase.config.json';
 
 export class FcmApiClient {
   private admin: admin.app.App;
+  private credential;
 
   constructor() {
-    const credential = {
-      type: firebaseConfig.type,
-      project_id: firebaseConfig.project_id,
-      private_key_id: firebaseConfig.private_key_id,
-      private_key: firebaseConfig.private_key,
-      client_email: firebaseConfig.client_email,
-      client_id: firebaseConfig.client_id,
-      auth_uri: firebaseConfig.auth_uri,
-      token_uri: firebaseConfig.token_uri,
-      auth_provider_x509_cert_url: firebaseConfig.auth_provider_x509_cert_url,
-      client_x509_cert_url: firebaseConfig.client_x509_cert_url,
-      universe_domain: firebaseConfig.universe_domain,
-    };
+    let firebaseConfig;
+    try {
+      firebaseConfig = require('./firebase.config.json');
 
-    if (admin.apps.length === 0) {
-      this.admin = admin.initializeApp({
-        credential: admin.credential.cert(credential as unknown),
-      });
+      this.credential = {
+        type: firebaseConfig.type,
+        project_id: firebaseConfig.project_id,
+        private_key_id: firebaseConfig.private_key_id,
+        private_key: firebaseConfig.private_key,
+        client_email: firebaseConfig.client_email,
+        client_id: firebaseConfig.client_id,
+        auth_uri: firebaseConfig.auth_uri,
+        token_uri: firebaseConfig.token_uri,
+        auth_provider_x509_cert_url: firebaseConfig.auth_provider_x509_cert_url,
+        client_x509_cert_url: firebaseConfig.client_x509_cert_url,
+        universe_domain: firebaseConfig.universe_domain,
+      };
+
+      if (admin.apps.length === 0) {
+        this.admin = admin.initializeApp({
+          credential: admin.credential.cert(this.credential as unknown),
+        });
+      }
+    } catch (error) {
+      // 파일이 없는 경우 에러가 발생할 것이므로, 에러를 무시하고 빈 객체로 초기화합니다.
+      firebaseConfig = {};
     }
   }
 
