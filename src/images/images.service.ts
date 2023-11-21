@@ -32,8 +32,6 @@ export class ImagesService {
 
         const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
 
-        ImageSrc.push(fileUrl);
-
         const params = {
           Bucket: process.env.S3_BUCKET_NAME,
           ACL: 'private',
@@ -41,6 +39,7 @@ export class ImagesService {
           Body: file.buffer,
           ContentEncoding: 'base64',
           ContentType: file.mimetype,
+          contentLength: 500000000,
           ContentDisposition: 'inline',
         };
 
