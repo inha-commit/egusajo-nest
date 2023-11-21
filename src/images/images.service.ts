@@ -44,6 +44,8 @@ export class ImagesService {
         };
 
         await this.uploadImage(params);
+
+        ImageSrc.push(fileUrl);
       }),
     );
 
