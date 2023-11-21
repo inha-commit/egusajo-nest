@@ -31,6 +31,9 @@ export class FundingEntity {
   @Column('int', { primary: true, name: 'ReceiverId' })
   ReceiverId: number;
 
+  @Column('int', { primary: true, name: 'PresentId' })
+  PresentId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -42,6 +45,7 @@ export class FundingEntity {
 
   // PresentEntity와의 관계
   @ManyToOne(() => PresentEntity, (presents) => presents.Funding, {
+    createForeignKeyConstraints: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })

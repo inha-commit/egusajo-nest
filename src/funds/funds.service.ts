@@ -13,6 +13,7 @@ import { PresentsService } from '../presents/presents.service';
 import { FcmApiClient } from '../utils/fcm.api.client';
 import { AuthService } from '../auth/auth.service';
 import Redis from '../utils/redis.client';
+import { dateToKoreaString, stringDateToKoreaString } from '../hooks/date';
 
 @Injectable()
 export class FundsService {
@@ -102,21 +103,35 @@ export class FundsService {
       'User',
     ]);
 
-    if (present.deadline < new Date()) {
+    // 기한이 지난 선물게시물에 대해선 펀딩 불가
+    if (
+      stringDateToKoreaString(present.deadline) < dateToKoreaString(new Date())
+    ) {
       throw new BadRequestException({
         message: '이미 종료된 펀딩입니다!',
         code: customErrorCode.FUNDING_ALREADY_END,
       });
     }
 
-    if (cost <= 0) {
+    // 금액은 100원 이상
+    if (cost < 100) {
       throw new BadRequestException({
-        message: '금액은 최소 0원 이상이어야 합니다!',
+        message: '금액은 최소 100원 이상이어야 합니다!',
         code: customErrorCode.FUNDING_MONEY_SHORT_FALL,
       });
     }
 
-    // TODO: 이미 펀딩을 했다면 불가하게?
+    const alreadyFund = await this.fundingRepository.findOne({
+      where: { PresentId: present.id, SenderId: userId, deletedAt: null },
+    });
+
+    if (alreadyFund) {
+      throw new BadRequestException({
+        message: '이미 해당 펀딩에 참여하였습니다!',
+        code: customErrorCode.FUNDING_ALREADY_PARTICIPATE,
+      });
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -134,7 +149,6 @@ export class FundsService {
       present.money = total_money;
       present.complete = total_complete;
 
-      // TODO: 이 부분 update 코드로 변경
       await queryRunner.manager.getRepository(PresentEntity).save(present);
 
       // 펀딩 받은 사람에게 알람 보내기

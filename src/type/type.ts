@@ -80,7 +80,7 @@ type Present = {
   complete: boolean;
   goal: number;
   money: number;
-  deadline: Date;
+  deadline: string;
   representImage: string;
   shortComment: string;
   longComment: string;
@@ -91,7 +91,7 @@ type CreatePresentDAO = {
   name: string;
   productLink: string;
   goal: number;
-  deadline: Date;
+  deadline: string;
   presentImages: string[];
   representImage: string;
   shortComment: string;
@@ -102,7 +102,7 @@ type UpdatePresentDAO = {
   name: string;
   productLink: string;
   goal: number;
-  deadline: Date;
+  deadline: string;
   presentImages: string[];
   representImage: string;
   shortComment: string;

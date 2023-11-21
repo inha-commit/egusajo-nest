@@ -39,8 +39,6 @@ export class ImagesService {
           Body: file.buffer,
           ContentEncoding: 'base64',
           ContentType: file.mimetype,
-          contentLength: 500000000,
-          ContentDisposition: 'inline',
         };
 
         await this.uploadImage(params);
