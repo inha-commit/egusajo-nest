@@ -19,6 +19,12 @@ import { ModelConverter } from '../type/model.converter';
 import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
 import { UsersService } from '../users/users.service';
+import {
+  dateToKorea,
+  dateToKoreaString,
+  stringDateToKorea,
+  stringDateToKoreaString,
+} from '../hooks/date';
 
 @Injectable()
 export class PresentsService {
@@ -218,15 +224,25 @@ export class PresentsService {
       });
     }
 
-    if (deadline < new Date()) {
+    // 오늘보다 기한 늦으면 안되게 하기
+    if (stringDateToKoreaString(deadline) < dateToKoreaString(new Date())) {
       throw new BadRequestException({
         message: '기한은 오늘보다 늦어야 합니다!',
         code: customErrorCode.PRESENT_DEADLINE_SHORT_FALL,
       });
     }
 
-    // TODO: 올해 한개의 게시글만 작성하게 해야하나? 생일 기점 한달 전에만 올릴 수 있게
-    // TODO: 펀딩은 선물 한개에 하나만 올릴 수 있게
+    const present = await this.presentRepository.findOne({
+      where: { id: userId, deletedAt: null },
+    });
+
+    // 한해에 하나의 게시물만 작성 가능하게 막기
+    if (present?.createdAt.getFullYear() === new Date().getFullYear()) {
+      throw new BadRequestException({
+        message: '한해에 한개의 게시물만 작성할 수 있습니다!',
+        code: customErrorCode.PRESENT_ONLY_ONE_IN_YEAR,
+      });
+    }
 
     try {
       await this.createPresent(user, data, queryRunner);
@@ -394,7 +410,8 @@ export class PresentsService {
       });
     }
 
-    if (deadline < new Date()) {
+    // 오늘보다 기한 늦으면 안되게 하기
+    if (stringDateToKoreaString(deadline) < dateToKoreaString(new Date())) {
       throw new BadRequestException({
         message: '기한은 오늘보다 늦어야 합니다!',
         code: customErrorCode.PRESENT_DEADLINE_SHORT_FALL,

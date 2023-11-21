@@ -1,3 +1,34 @@
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+
+function dateToKorea(inputDate: Date): dayjs.Dayjs {
+  const time: dayjs.Dayjs = dayjs(inputDate);
+
+  // 한국 시간으로 변환
+  return time.locale('ko');
+}
+
+function stringDateToKorea(inputDate: string): dayjs.Dayjs {
+  const time: dayjs.Dayjs = dayjs(inputDate);
+
+  // 한국 시간으로 변환
+  return time.locale('ko');
+}
+
+function dateToKoreaString(inputDate: Date): string {
+  const time: dayjs.Dayjs = dayjs(inputDate);
+
+  // 한국 시간으로 변환
+  return time.locale('ko').format('YYYY-MM-DD HH:mm:ss');
+}
+
+function stringDateToKoreaString(inputDate: string): string {
+  const now: dayjs.Dayjs = dayjs(inputDate);
+
+  // 한국 시간으로 변환
+  return now.locale('ko').format('YYYY-MM-DD HH:mm:ss');
+}
+
 function createdAtToString(inputDate: Date | string): string {
   const date = new Date(inputDate);
 
@@ -26,4 +57,11 @@ function deadlineToString(inputDate: Date | string): string {
   }
 }
 
-export { createdAtToString, deadlineToString };
+export {
+  createdAtToString,
+  deadlineToString,
+  dateToKorea,
+  stringDateToKorea,
+  dateToKoreaString,
+  stringDateToKoreaString,
+};

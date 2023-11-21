@@ -41,7 +41,7 @@ export class PresentEntity {
 
   // 펀딩 마감일
   @Column('date')
-  deadline: Date;
+  deadline: string;
 
   // 대표 이미지
   @Column('varchar')
