@@ -55,7 +55,13 @@ export class ImagesService {
    * @param buffer
    */
   async resizeImage(buffer: Buffer): Promise<Buffer> {
-    return sharp(buffer).resize().withMetadata().toBuffer();
+    return sharp(buffer)
+      .resize({
+        width: 800,
+        height: 800,
+        fit: 'inside',
+      })
+      .toBuffer();
   }
 
   /**
