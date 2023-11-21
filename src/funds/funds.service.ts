@@ -141,12 +141,16 @@ export class FundsService {
       const fcmToken = await this.authService.getFcmToken(present.User.id);
 
       if (fcmToken && present.User.alarm) {
-        this.fcmApiClient.newFundingMessage(user.nickname, cost, fcmToken);
+        this.fcmApiClient.sendNewFundingNotification(
+          user.nickname,
+          cost,
+          fcmToken,
+        );
       }
 
       // 완료된 사람에게 알람 보내기
       if (total_complete && fcmToken && present.User.alarm) {
-        this.fcmApiClient.completeFundingMessage(fcmToken);
+        this.fcmApiClient.sendCompleteFundingNotification(fcmToken);
       }
 
       await queryRunner.commitTransaction();

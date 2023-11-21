@@ -1,6 +1,15 @@
 import admin from 'firebase-admin';
 import { Logger } from '@nestjs/common';
 
+type FcmMessage = {
+  data: {
+    title: string; // 알림 메세지 제목
+    body: string; // 알림 메세지 내용
+    code: string; // 알림 메세지 구분 코드
+  };
+  token: string; // 사용자 Fcm Token
+};
+
 export class FcmApiClient {
   private admin: admin.app.App;
 
@@ -27,6 +36,7 @@ export class FcmApiClient {
       universe_domain: process.env.FCM_CREDENTIAL_UNIVERSE_DOMAIN,
       private_key: privateKey,
     };
+
     if (admin.apps.length === 0) {
       this.admin = admin.initializeApp({
         credential: admin.credential.cert(this.credential as unknown),
@@ -34,83 +44,65 @@ export class FcmApiClient {
     }
   }
 
-  async newFundingMessage(
+  private createMessage(
+    title: string,
+    body: string,
+    code: string,
+    token: string,
+  ) {
+    return {
+      data: { title, body, code },
+      token: token,
+    };
+  }
+
+  private async sendMessage(message: FcmMessage) {
+    try {
+      if (process.env.NODE_ENV === 'production') {
+        await this.admin.messaging().send(message);
+      }
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
+
+  async sendNewFundingNotification(
     senderNickname: string,
-    money: number,
+    cost: number,
     fcmToken: string,
   ) {
-    try {
-      if (process.env.NODE_ENV === 'production') {
-        const message = {
-          data: {
-            title: '펀딩 도착 알림',
-            body: `${senderNickname}님이 ${money}원을 펀딩해 주셨어요!`,
-            code: 'fund',
-          },
-          token: fcmToken,
-        };
+    const title = '펀딩 도착 알림';
+    const body = `${senderNickname}님이 ${cost}원을 펀딩해 주셨어요!`;
+    const code = 'fund';
 
-        await this.admin.messaging().send(message);
-      }
-    } catch (error) {
-      this.logger.error(error);
-    }
+    const message = this.createMessage(title, body, code, fcmToken);
+    await this.sendMessage(message);
   }
 
-  async completeFundingMessage(fcmToken: string) {
-    try {
-      if (process.env.NODE_ENV === 'production') {
-        const message = {
-          data: {
-            title: '펀딩 마감 알림',
-            body: `펀딩이 마감되었어요!`,
-            code: 'complete',
-          },
-          token: fcmToken,
-        };
+  async sendCompleteFundingNotification(fcmToken: string) {
+    const title = '펀딩 마감 알림';
+    const body = '펀딩이 마감되었어요!';
+    const code = 'complete';
 
-        await this.admin.messaging().send(message);
-      }
-    } catch (error) {
-      this.logger.error(error);
-    }
+    const message = this.createMessage(title, body, code, fcmToken);
+    await this.sendMessage(message);
   }
 
-  async newFollowerMessage(userNickname: string, fcmToken: string) {
-    try {
-      if (process.env.NODE_ENV === 'production') {
-        const message = {
-          data: {
-            title: '친구 요청 알림',
-            body: `${userNickname}님이 친구가 되고 싶어해요`,
-            code: 'follow',
-          },
-          token: fcmToken,
-        };
+  async sendNewFollowerNotification(userNickname: string, fcmToken: string) {
+    const title = '친구 요청 알림';
+    const body = `${userNickname}님이 친구가 되고 싶어해요`;
+    const code = 'follow';
 
-        await this.admin.messaging().send(message);
-      }
-    } catch (error) {
-      this.logger.error(error);
-    }
+    const message = this.createMessage(title, body, code, fcmToken);
+    await this.sendMessage(message);
   }
 
-  async followAcceptMessage(userNickname: string, fcmToken: string) {
-    try {
-      if (process.env.NODE_ENV === 'production') {
-        const message = {
-          data: {
-            title: '친구 요청 수락 알림',
-            body: `${userNickname}님과 친구가 되었어요!`,
-            code: 'accept',
-          },
-          token: fcmToken,
-        };
+  async sendFollowAcceptNotification(userNickname: string, fcmToken: string) {
+    const title = '친구 요청 수락 알림';
+    const body = `${userNickname}님과 친구가 되었어요!`;
+    const code = 'accept';
 
-        await this.admin.messaging().send(message);
-      }
-    } catch (error) {
-      this.logger.error(error);
-    }
+    const message = this.createMessage(title, body, code, fcmToken);
+    await this.sendMessage(message);
   }
 }

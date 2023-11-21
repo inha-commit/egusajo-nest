@@ -66,9 +66,9 @@ export class FollowsService {
 
       // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
       if (isFollow) {
-        this.fcmApiClient.followAcceptMessage(user.nickname, fcmToken);
+        this.fcmApiClient.sendFollowAcceptNotification(user.nickname, fcmToken);
       } else {
-        this.fcmApiClient.newFollowerMessage(user.nickname, fcmToken);
+        this.fcmApiClient.sendNewFollowerNotification(user.nickname, fcmToken);
       }
     }
 
@@ -109,9 +109,9 @@ export class FollowsService {
 
       // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
       if (isFollow) {
-        this.fcmApiClient.followAcceptMessage(user.nickname, fcmToken);
+        this.fcmApiClient.sendFollowAcceptNotification(user.nickname, fcmToken);
       } else {
-        this.fcmApiClient.newFollowerMessage(user.nickname, fcmToken);
+        this.fcmApiClient.sendNewFollowerNotification(user.nickname, fcmToken);
       }
     }
 
