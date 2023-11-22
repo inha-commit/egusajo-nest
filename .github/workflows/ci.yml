@@ -53,6 +53,7 @@ jobs:
             SLACK_API_LATENCY_CHANNEL_ID=${{ secrets.SLACK_API_LATENCY_CHANNEL_ID }}
             SLACK_FATAL_ERROR_CHANNEL_ID=${{ secrets.SLACK_FATAL_ERROR_CHANNEL_ID }}
             REDIS_URL=${{ secrets.REDIS_URL }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             BASIC_PROFILE_IMAGE_SRC=${{ secrets.BASIC_PROFILE_IMAGE_SRC }}
             FCM_CREDENTIAL_TYPE=${{ secrets.FCM_CREDENTIAL_TYPE }}
             FCM_CREDENTIAL_PROJECT_ID=${{ secrets.FCM_CREDENTIAL_PROJECT_ID }}
