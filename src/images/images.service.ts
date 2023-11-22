@@ -27,7 +27,6 @@ export class ImagesService {
       files.map(async (file: Express.MulterS3.File) => {
         const key = `${type}/${Date.now() + file.originalname}`;
 
-        console.log(file.mimetype);
         // const resizedBuffer = this.resizeImage(file.buffer);
 
         const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;

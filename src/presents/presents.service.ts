@@ -19,12 +19,7 @@ import { ModelConverter } from '../type/model.converter';
 import { CreatePresentRequestDto } from './dto/createPresent.request.dto';
 import { UpdatePresentRequestDto } from './dto/updatePresent.request.dto';
 import { UsersService } from '../users/users.service';
-import {
-  dateToKorea,
-  dateToKoreaString,
-  stringDateToKorea,
-  stringDateToKoreaString,
-} from '../hooks/date';
+import { dateToKoreaString, stringDateToKoreaString } from '../hooks/date';
 
 @Injectable()
 export class PresentsService {
@@ -457,7 +452,7 @@ export class PresentsService {
 
     // TODO: 돈이 들어 있다면 게시물 취소는 안되게 해야함
 
-    await this.presentRepository.softDelete({ id: presentId });
+    await this.presentRepository.delete({ id: presentId });
 
     return { success: true };
   }

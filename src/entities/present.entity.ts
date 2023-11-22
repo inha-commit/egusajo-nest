@@ -55,7 +55,7 @@ export class PresentEntity {
   @Column('text')
   longComment: string;
 
-  @Column('int', { primary: true, name: 'UserId' })
+  @Column('int', { name: 'UserId', nullable: true })
   UserId: number;
 
   @CreateDateColumn({ nullable: true })
@@ -69,8 +69,7 @@ export class PresentEntity {
 
   // UserEntity와의 관계
   @ManyToOne(() => UserEntity, (users) => users.Present, {
-    createForeignKeyConstraints: false,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([
@@ -86,6 +85,12 @@ export class PresentEntity {
   Funding: FundingEntity[];
 
   // PresentImage와의 관계
-  @OneToMany(() => PresentImageEntity, (presentImages) => presentImages.Present)
+  @OneToMany(
+    () => PresentImageEntity,
+    (presentImages) => presentImages.Present,
+    {
+      cascade: true,
+    },
+  )
   PresentImage: PresentImageEntity[];
 }

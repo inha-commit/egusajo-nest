@@ -25,13 +25,13 @@ export class FundingEntity {
   @Column('text')
   comment: string;
 
-  @Column('int', { primary: true, name: 'SenderId' })
+  @Column('int', { name: 'SenderId', nullable: true })
   SenderId: number;
 
-  @Column('int', { primary: true, name: 'ReceiverId' })
+  @Column('int', { name: 'ReceiverId', nullable: true })
   ReceiverId: number;
 
-  @Column('int', { primary: true, name: 'PresentId' })
+  @Column('int', { name: 'PresentId', nullable: true })
   PresentId: number;
 
   @CreateDateColumn()
@@ -45,28 +45,40 @@ export class FundingEntity {
 
   // PresentEntity와의 관계
   @ManyToOne(() => PresentEntity, (presents) => presents.Funding, {
-    createForeignKeyConstraints: false,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'PresentId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'PresentId',
+      referencedColumnName: 'id',
+    },
+  ])
   Present: PresentEntity;
 
   // UserEntity와의 관계 - 펀딩 한 사람
   @ManyToOne(() => UserEntity, (users) => users.Funding, {
-    createForeignKeyConstraints: false,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'SenderId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'SenderId',
+      referencedColumnName: 'id',
+    },
+  ])
   Sender: UserEntity;
 
   // UserEntity와의 관계 - 펀딩 받은 사람
   @ManyToOne(() => UserEntity, (users) => users.Funded, {
-    createForeignKeyConstraints: false,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'ReceiverId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'ReceiverId',
+      referencedColumnName: 'id',
+    },
+  ])
   Receiver: UserEntity;
 }

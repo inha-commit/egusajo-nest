@@ -30,7 +30,7 @@ export class PresentImageEntity {
 
   // PresentEntity와의 관계
   @ManyToOne(() => PresentEntity, (presents) => presents.PresentImage, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'PresentId', referencedColumnName: 'id' }])
