@@ -18,6 +18,7 @@ import { TypeormConfigService } from './config/typeorm.config.service';
 import { CustomErrorFilter } from './type/custom.error.filter';
 import { SlackApiClient } from './utils/slack.api.client';
 import { FundsModule } from './funds/funds.module';
+import { FcmApiClient } from './utils/fcm.api.client';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { FundsModule } from './funds/funds.module';
     AppService,
     Logger,
     SlackApiClient,
+    FcmApiClient,
     {
       provide: APP_FILTER,
       useClass: CustomErrorFilter,
