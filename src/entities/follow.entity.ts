@@ -5,12 +5,19 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 @Entity({ schema: `${process.env.DATABASE_NAME}`, name: 'Follow' })
 export class FollowEntity {
+  @Column('int', { primary: true, name: 'followerId' })
+  followerId: number;
+
+  @Column('int', { primary: true, name: 'followingId' })
+  followingId: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -20,25 +27,27 @@ export class FollowEntity {
   @DeleteDateColumn()
   deletedAt: Date | null;
 
-  @Column('int', { primary: true, name: 'followerId' })
-  followerId: number;
-
-  @Column('int', { primary: true, name: 'followingId' })
-  followingId: number;
-
   @ManyToOne(() => UserEntity, (user) => user.Follower, {
-    createForeignKeyConstraints: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'followerId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'followerId',
+      referencedColumnName: 'id',
+    },
+  ])
   follower: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.Following, {
-    createForeignKeyConstraints: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'followingId', referencedColumnName: 'id' }])
+  @JoinColumn([
+    {
+      name: 'followingId',
+      referencedColumnName: 'id',
+    },
+  ])
   following: UserEntity;
 }

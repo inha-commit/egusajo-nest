@@ -227,7 +227,7 @@ export class FundsService {
 
     try {
       // funding 삭제
-      await this.fundingRepository.softDelete({ id: fundId });
+      await this.fundingRepository.delete({ id: fundId });
 
       // present에서 money 차감
       const total_money = present.money - fund.cost;

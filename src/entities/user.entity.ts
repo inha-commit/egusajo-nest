@@ -47,10 +47,6 @@ export class UserEntity {
   @Column('varchar')
   profileImgSrc: string;
 
-  // fcm 알림 받을 고유 id
-  // @Column('varchar')
-  // fcmId: string;
-
   // 알람 수신 여부
   @Column('boolean', { default: true })
   alarm: boolean;
@@ -88,7 +84,9 @@ export class UserEntity {
   Follower: UserEntity[];
 
   // PresentEntity와의 관계
-  @OneToMany(() => PresentEntity, (presents) => presents.User)
+  @OneToMany(() => PresentEntity, (presents) => presents.User, {
+    cascade: true,
+  })
   Present: PresentEntity[];
 
   // FudingEntity와의 관계 - 펀딩한 사람
