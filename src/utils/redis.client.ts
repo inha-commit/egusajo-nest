@@ -9,9 +9,16 @@ class Redis {
   private readonly logger: Logger;
 
   constructor() {
-    this.client = createClient({
-      url: process.env.REDIS_URL,
-    });
+    if (process.env.NODE_ENV === 'production') {
+      this.client = createClient({
+        url: process.env.REDIS_URL,
+        password: process.env.REDIS_PASSWORD,
+      });
+    } else {
+      this.client = createClient({
+        url: process.env.REDIS_URL,
+      });
+    }
 
     this.client.on('connect', () => {
       this.logger.log(`Redis Connected`);
