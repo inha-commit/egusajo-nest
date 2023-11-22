@@ -90,7 +90,9 @@ export class UserEntity {
   Present: PresentEntity[];
 
   // FudingEntity와의 관계 - 펀딩한 사람
-  @OneToMany(() => FundingEntity, (fundings) => fundings.Sender)
+  @OneToMany(() => FundingEntity, (fundings) => fundings.Sender, {
+    cascade: true,
+  })
   Funding: FundingEntity[];
 
   // FudingEntity와의 관계 - 펀딩받은 사람

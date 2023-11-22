@@ -81,7 +81,9 @@ export class PresentEntity {
   User: UserEntity;
 
   // FundingEntity와의 관계
-  @OneToMany(() => FundingEntity, (fundings) => fundings.Present)
+  @OneToMany(() => FundingEntity, (fundings) => fundings.Present, {
+    cascade: true,
+  })
   Funding: FundingEntity[];
 
   // PresentImage와의 관계
