@@ -8,7 +8,6 @@ export const validationSchema = Joi.object({
   DATABASE_NAME: Joi.string().required(),
 
   REDIS_URL: Joi.string().required(),
-  REDIS_PASSWORD: Joi.string().required(),
 
   BASIC_PROFILE_IMAGE_SRC: Joi.string().required(),
 
