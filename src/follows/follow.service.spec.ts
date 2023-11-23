@@ -156,10 +156,9 @@ describe('FollowService', () => {
         snsId: 'test_snsId',
         name: 'test_name',
         nickname: 'test_nickname',
-        birthday: new Date('1998/09/14'),
+        birthday: '1998/09/14',
         bank: 'test_bank',
         account: 'test_account',
-        fcmId: 'basic.png',
         profileImgSrc: 'basic.png',
         alarm: true,
       } as UserEntity;
@@ -169,10 +168,9 @@ describe('FollowService', () => {
         snsId: 'test2_snsId',
         name: 'test2_name',
         nickname: 'test2_nickname',
-        birthday: new Date('1998/09/14'),
+        birthday: '1998/09/14',
         bank: 'test2_bank',
         account: 'test2_account',
-        fcmId: 'basic.png',
         profileImgSrc: 'basic.png',
         alarm: true,
       } as UserEntity;

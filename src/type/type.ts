@@ -22,18 +22,21 @@ type User = {
   snsId: string;
   name: string;
   nickname: string;
-  birthday: Date;
+  birthday: string;
   bank: string;
   account: string;
   profileImgSrc: string;
   alarm: boolean;
+  fundingNum?: number;
+  fundedNum?: number;
+  isFollowing?: boolean;
 };
 
 type CreateUserDAO = {
   snsId: string;
   name: string;
   nickname: string;
-  birthday: Date;
+  birthday: string;
   bank: string;
   account: string;
   profileImgSrc: string;
@@ -42,7 +45,7 @@ type CreateUserDAO = {
 type UpdateUserDAO = {
   name: string;
   nickname: string;
-  birthday: Date;
+  birthday: string;
   bank: string;
   account: string;
   profileImgSrc: string;
@@ -58,7 +61,7 @@ type Follower = {
   id: number;
   name: string;
   nickname: string;
-  birthday: Date;
+  birthday: string;
   profileImgSrc: string;
   alarm: boolean;
   isFollowing: boolean;

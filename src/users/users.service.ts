@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
 import customErrorCode from '../type/custom.error.code';
 import { ModelConverter } from '../type/model.converter';
@@ -137,6 +137,51 @@ export class UsersService {
     }
 
     return ModelConverter.user(user);
+  }
+
+  /**
+   * id로 유저 가져오기
+   * @param userId
+   */
+  async getUserById(userId: number, id: number): Promise<User> {
+    const user = await this.findUser('id', id, [
+      'Followings',
+      'Funding',
+      'Funded',
+    ]);
+
+    // 내가 팔로잉 하고 있는지 여부
+    const isFollowing = user.Followings.some(
+      (follower) => follower.id === userId,
+    );
+
+    // 선물게시물 개수, 펀딩 개수
+    const fundingNum = user.Funding.length;
+    const fundedNum = user.Funded.length;
+
+    return {
+      ...ModelConverter.user(user),
+      fundingNum: fundingNum,
+      fundedNum: fundedNum,
+      isFollowing: isFollowing,
+    };
+  }
+
+  /**
+   * 닉네임으로 유저 검색
+   * @param nickname
+   */
+  async getUsersByNickname(nickname: string): Promise<User[]> {
+    const users = await this.userRepository.find({
+      where: {
+        nickname: ILike(`%${nickname}%`),
+        deletedAt: null,
+      },
+    });
+
+    return users.map((user) => {
+      return ModelConverter.user(user);
+    });
   }
 
   /**

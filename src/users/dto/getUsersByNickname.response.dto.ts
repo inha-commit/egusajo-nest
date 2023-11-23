@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class GetFollowerResponseDto {
+class User {
   @ApiProperty({
     name: 'id',
     description: '사용자 id',
@@ -31,27 +31,31 @@ class GetFollowerResponseDto {
   })
   public profileImgSrc: string;
 
-  @ApiProperty({
-    name: 'isFollowing',
-    description: '내가 팔로우 하고 있는지 여부',
-  })
-  public isFollowing: boolean;
+  constructor(obj: User) {
+    if (typeof obj.birthday === 'string') {
+      this.birthday = obj.birthday.replace(
+        /(\d{4})-(\d{2})-(\d{2})/,
+        '$1/$2/$3',
+      );
+    } else {
+      const year = obj.birthday.getFullYear();
+      const month = String(obj.birthday.getMonth() + 1).padStart(2, '0');
+      const day = String(obj.birthday.getDate()).padStart(2, '0');
+      this.birthday = `${year}/${month}/${day}`;
+    }
 
-  constructor(obj: GetFollowerResponseDto) {
     this.id = obj.id;
     this.name = obj.name;
     this.nickname = obj.nickname;
-    this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
-    this.isFollowing = obj.isFollowing;
   }
 }
 
-export class GetFollowersResponseDto {
-  @ApiProperty({ type: [GetFollowerResponseDto] })
-  public followers: GetFollowerResponseDto[];
+export class GetUsersByNicknameResponseDto {
+  @ApiProperty({ type: [User] })
+  public users: User[];
 
-  constructor(obj: GetFollowerResponseDto[]) {
-    this.followers = obj.map((user) => new GetFollowerResponseDto(user));
+  constructor(obj: User[]) {
+    this.users = obj.map((user) => new User(user));
   }
 }

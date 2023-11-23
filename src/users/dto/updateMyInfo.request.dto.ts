@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateMyInfoRequestDto {
   @ApiProperty({
@@ -26,10 +19,10 @@ export class UpdateMyInfoRequestDto {
   @ApiProperty({
     name: 'birthday',
     description: 'YYYY/MM/DD 형식으로 보내주세요',
+    example: '1998/09/14',
   })
   @IsString()
-  @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  public birthday: Date;
+  public birthday: string;
 
   @ApiProperty({
     description: '사용자 은행',

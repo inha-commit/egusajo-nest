@@ -1,6 +1,5 @@
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 
 export class SignupRequestDto {
   @ApiProperty({
@@ -25,9 +24,10 @@ export class SignupRequestDto {
 
   @ApiProperty({
     description: 'YYYY/MM/DD 형식으로 보내주세요',
+    example: '1998/09/14',
   })
-  @Transform(({ value }) => new Date(value), { toClassOnly: true })
-  readonly birthday: Date;
+  @IsString()
+  readonly birthday: string;
 
   @ApiProperty({
     description: '사용자 은행',

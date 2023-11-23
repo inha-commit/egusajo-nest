@@ -5,11 +5,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 
 export class UpdatePresentRequestDto {
   @ApiProperty({
@@ -27,12 +24,14 @@ export class UpdatePresentRequestDto {
 
   @ApiProperty({
     description: '목표 금액',
+    example: 10000,
   })
   @IsNumber()
   readonly goal: number;
 
   @ApiProperty({
     description: '목표 날짜 YYYY/MM/DD 형식으로 보내주세요',
+    example: '1998/09/14',
   })
   @IsString()
   readonly deadline: string;

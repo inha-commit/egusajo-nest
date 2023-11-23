@@ -3,6 +3,12 @@ import { IsString } from 'class-validator';
 
 export class GetMyInfoResponseDto {
   @ApiProperty({
+    name: 'id',
+    description: '사용자 id',
+  })
+  public id: number;
+
+  @ApiProperty({
     name: 'name',
     description: '사용자 이름',
   })
@@ -45,23 +51,13 @@ export class GetMyInfoResponseDto {
   public alarm: boolean;
 
   constructor(obj: GetMyInfoResponseDto) {
-    if (typeof obj.birthday === 'string') {
-      this.birthday = obj.birthday.replace(
-        /(\d{4})-(\d{2})-(\d{2})/,
-        '$1/$2/$3',
-      );
-    } else {
-      const year = obj.birthday.getFullYear();
-      const month = String(obj.birthday.getMonth() + 1).padStart(2, '0');
-      const day = String(obj.birthday.getDate()).padStart(2, '0');
-      this.birthday = `${year}/${month}/${day}`;
-    }
-
+    this.id = obj.id;
     this.name = obj.name;
     this.nickname = obj.nickname;
+    this.birthday = obj.birthday;
+    this.profileImgSrc = obj.profileImgSrc;
     this.bank = obj.bank;
     this.account = obj.account;
-    this.profileImgSrc = obj.profileImgSrc;
     this.alarm = obj.alarm;
   }
 }

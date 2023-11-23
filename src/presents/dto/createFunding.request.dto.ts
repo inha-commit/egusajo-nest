@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateFundingRequestDto {
   @ApiProperty({
     description: '펀딩할 금액',
+    example: 10000,
   })
   @IsNumber()
   readonly cost: number;

@@ -32,21 +32,10 @@ class GetFollowingResponseDto {
   public profileImgSrc: string;
 
   constructor(obj: GetFollowingResponseDto) {
-    if (typeof obj.birthday === 'string') {
-      this.birthday = obj.birthday.replace(
-        /(\d{4})-(\d{2})-(\d{2})/,
-        '$1/$2/$3',
-      );
-    } else {
-      const year = obj.birthday.getFullYear();
-      const month = String(obj.birthday.getMonth() + 1).padStart(2, '0');
-      const day = String(obj.birthday.getDate()).padStart(2, '0');
-      this.birthday = `${year}/${month}/${day}`;
-    }
-
     this.id = obj.id;
     this.name = obj.name;
     this.nickname = obj.nickname;
+    this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
   }
 }
@@ -56,15 +45,6 @@ export class GetFollowingsResponseDto {
   public followings: GetFollowingResponseDto[];
 
   constructor(obj: GetFollowingResponseDto[]) {
-    this.followings = obj.map(
-      (item) =>
-        new GetFollowingResponseDto({
-          id: item.id,
-          name: item.name,
-          nickname: item.nickname,
-          birthday: item.birthday,
-          profileImgSrc: item.profileImgSrc,
-        }),
-    );
+    this.followings = obj.map((user) => new GetFollowingResponseDto(user));
   }
 }
