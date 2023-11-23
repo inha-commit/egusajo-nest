@@ -38,13 +38,13 @@ export class GetUserByIdResponseDto {
   public isFollowing?: boolean;
 
   @ApiProperty({
-    name: 'presentNum',
+    name: 'fundingNum',
     description: '지금까지 펀딩한 횟수',
   })
   public fundingNum?: number;
 
   @ApiProperty({
-    name: 'fundNum',
+    name: 'fundedNum',
     description: '지금까지 펀딩받은 횟수',
   })
   public fundedNum?: number;
