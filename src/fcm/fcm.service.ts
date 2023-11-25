@@ -47,7 +47,7 @@ export class FcmService {
 
   private async sendMessage(message: FcmMessage) {
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         await admin.messaging().send(message);
       }
     } catch (error) {
