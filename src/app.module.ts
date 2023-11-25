@@ -4,21 +4,23 @@ import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TypeormConfigService } from './config/typeorm.config.service';
 
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { FollowsModule } from './follows/follows.module';
 import { ImagesModule } from './images/images.module';
 import { PresentsModule } from './presents/presents.module';
+import { FundsModule } from './funds/funds.module';
+import { FcmModule } from './fcm/fcm.module';
+import { RedisModule } from './redis/redis.module';
+import { SlackModule } from './slack/slack.module';
 
 import { validationSchema } from './config/validationSchema';
-import { TypeormConfigService } from './config/typeorm.config.service';
-import { CustomErrorFilter } from './type/custom.error.filter';
-import { SlackApiClient } from './utils/slack.api.client';
-import { FundsModule } from './funds/funds.module';
-import { FcmApiClient } from './utils/fcm.api.client';
+
+import { CustomErrorFilter } from './filter/custom.error.filter';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { FcmApiClient } from './utils/fcm.api.client';
     PresentsModule,
     ImagesModule,
     FundsModule,
+    FcmModule,
+    RedisModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
@@ -44,18 +48,17 @@ import { FcmApiClient } from './utils/fcm.api.client';
       }),
       inject: [ConfigService],
     }),
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     Logger,
-    SlackApiClient,
-    FcmApiClient,
     {
       provide: APP_FILTER,
       useClass: CustomErrorFilter,
     },
   ],
-  exports: [SlackApiClient],
+  exports: [RedisModule],
 })
 export class AppModule {}

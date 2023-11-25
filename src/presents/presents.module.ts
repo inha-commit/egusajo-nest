@@ -10,6 +10,10 @@ import { FundingEntity } from '../entities/funding.entity';
 import { UsersService } from '../users/users.service';
 import { FundsService } from '../funds/funds.service';
 import { AuthService } from '../auth/auth.service';
+import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
+import { SlackService } from '../slack/slack.service';
 
 @Module({
   imports: [
@@ -19,6 +23,7 @@ import { AuthService } from '../auth/auth.service';
       PresentImageEntity,
       FundingEntity,
     ]),
+    RedisModule,
   ],
   controllers: [PresentsController],
   providers: [
@@ -26,7 +31,10 @@ import { AuthService } from '../auth/auth.service';
     FundsService,
     AuthService,
     UsersService,
+    FcmService,
+    RedisService,
     JwtService,
+    SlackService,
   ],
 })
 export class PresentsModule {}

@@ -9,16 +9,16 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { SlackApiClient } from '../utils/slack.api.client';
+import { SlackService } from '../slack/slack.service';
 
 @Injectable()
 export class ApiTimeInterceptor implements NestInterceptor {
   private logger: Logger;
-  private slackClient: SlackApiClient;
+  private slackService: SlackService;
 
   constructor() {
     this.logger = new Logger();
-    this.slackClient = new SlackApiClient();
+    this.slackService = new SlackService();
   }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -40,7 +40,7 @@ export class ApiTimeInterceptor implements NestInterceptor {
         }
 
         if (duration > 2000) {
-          this.slackClient.sendApiLatency(method, originalUrl, duration);
+          this.slackService.sendApiLatency(method, originalUrl, duration);
         }
       }),
     );

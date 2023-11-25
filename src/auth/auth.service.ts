@@ -2,25 +2,22 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
-import { SlackApiClient } from '../utils/slack.api.client';
+
 import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 import { UsersService } from '../users/users.service';
-import Redis from '../utils/redis.client';
+import { RedisService } from '../redis/redis.service';
+import { SlackService } from '../slack/slack.service';
 
 @Injectable()
 export class AuthService {
-  private slackClient: SlackApiClient;
-  private redis: any;
-
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-  ) {
-    this.slackClient = new SlackApiClient();
-    this.redis = Redis.getInstance().getClient();
-  }
+    private redisService: RedisService,
+    private slackSevice: SlackService,
+  ) {}
 
   /**
    * 로그인
@@ -34,7 +31,7 @@ export class AuthService {
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
 
-    await this.saveRedisFcmToken(user.id, fcmId);
+    await this.redisService.saveRedisFcmToken(user.id, fcmId);
 
     return { accessToken, refreshToken };
   }
@@ -68,9 +65,9 @@ export class AuthService {
 
     const user = await this.usersService.createUser(data);
 
-    await this.saveRedisFcmToken(user.id, fcmId);
+    await this.redisService.saveRedisFcmToken(user.id, fcmId);
 
-    await this.slackClient.newUser();
+    await this.slackSevice.newUser();
 
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
@@ -99,19 +96,6 @@ export class AuthService {
     }
 
     return { success: true };
-  }
-
-  /**
-   * fcmToken redis에 저장
-   * @param userId
-   * @param fcmToken
-   */
-  async saveRedisFcmToken(userId: number, fcmToken: string): Promise<void> {
-    await this.redis.set(userId.toString(), fcmToken);
-  }
-
-  async getFcmToken(userId: number): Promise<string> {
-    return this.redis.get(userId.toString());
   }
 
   /**

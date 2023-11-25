@@ -5,7 +5,6 @@ import { winstonConfig } from './config/winston.config';
 import { ValidationPipe } from '@nestjs/common';
 import { ApiTimeInterceptor } from './interceptor/api.time.interceptor';
 import { swaggerConfig } from './config/swagger.config';
-import Redis from './utils/redis.client';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,11 +19,6 @@ async function bootstrap() {
 
   // class-validator pipe
   app.useGlobalPipes(new ValidationPipe());
-
-  // redis connect
-  const redis = Redis.getInstance();
-
-  await redis.connect();
 
   await app.listen(3000);
 }

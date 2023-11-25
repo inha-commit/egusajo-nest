@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
+import { SlackService } from '../slack/slack.service';
 
 @Module({
   imports: [
@@ -17,8 +20,9 @@ import { UsersService } from '../users/users.service';
       }),
       inject: [ConfigService],
     }),
+    RedisModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService],
+  providers: [AuthService, UsersService, RedisService, SlackService],
 })
 export class AuthModule {}
