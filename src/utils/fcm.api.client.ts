@@ -11,8 +11,6 @@ type FcmMessage = {
 };
 
 export class FcmApiClient {
-  private admin: admin.app.App;
-
   private credential;
 
   private readonly logger: Logger;
@@ -38,7 +36,7 @@ export class FcmApiClient {
     };
 
     if (admin.apps.length === 0) {
-      this.admin = admin.initializeApp({
+      admin.initializeApp({
         credential: admin.credential.cert(this.credential as unknown),
       });
     }
@@ -59,7 +57,7 @@ export class FcmApiClient {
   private async sendMessage(message: FcmMessage) {
     try {
       if (process.env.NODE_ENV === 'production') {
-        await this.admin.messaging().send(message);
+        await admin.messaging().send(message);
       }
     } catch (error) {
       this.logger.error(error);
