@@ -11,14 +11,12 @@ import { CreateFundDAO } from '../type/type';
 import { ModelConverter } from '../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
 import { AuthService } from '../auth/auth.service';
-import Redis from '../utils/redis.client';
 import { dateToKoreaString, stringDateToKoreaString } from '../hooks/date';
 import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class FundsService {
-  private redis: any;
-
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
@@ -30,10 +28,9 @@ export class FundsService {
     private usersService: UsersService,
     private presentsService: PresentsService,
     private fcmService: FcmService,
+    private redisService: RedisService,
     private dataSource: DataSource,
-  ) {
-    this.redis = Redis.getInstance().getClient();
-  }
+  ) {}
 
   async createFund(
     createFundDAO: CreateFundDAO,
@@ -150,7 +147,7 @@ export class FundsService {
       await queryRunner.manager.getRepository(PresentEntity).save(present);
 
       // 펀딩 받은 사람에게 알람 보내기
-      const fcmToken = await this.authService.getFcmToken(present.User.id);
+      const fcmToken = await this.redisService.getFcmToken(present.User.id);
 
       if (fcmToken && present.User.alarm) {
         this.fcmService.sendNewFundingNotification(

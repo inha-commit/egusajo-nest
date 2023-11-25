@@ -19,6 +19,7 @@ import { CustomErrorFilter } from './type/custom.error.filter';
 import { SlackApiClient } from './utils/slack.api.client';
 import { FundsModule } from './funds/funds.module';
 import { FcmModule } from './fcm/fcm.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FcmModule } from './fcm/fcm.module';
     ImagesModule,
     FundsModule,
     FcmModule,
+    RedisModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
@@ -56,6 +58,6 @@ import { FcmModule } from './fcm/fcm.module';
       useClass: CustomErrorFilter,
     },
   ],
-  exports: [SlackApiClient],
+  exports: [SlackApiClient, RedisModule],
 })
 export class AppModule {}

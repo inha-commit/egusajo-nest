@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { PresentsService } from '../presents/presents.service';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { FcmService } from '../fcm/fcm.service';
       PresentImageEntity,
       FundingEntity,
     ]),
+    RedisModule,
   ],
   controllers: [FundsController],
   providers: [
@@ -29,6 +32,7 @@ import { FcmService } from '../fcm/fcm.service';
     UsersService,
     JwtService,
     FcmService,
+    RedisService,
   ],
 })
 export class FundsModule {}

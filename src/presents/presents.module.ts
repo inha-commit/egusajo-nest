@@ -11,6 +11,8 @@ import { UsersService } from '../users/users.service';
 import { FundsService } from '../funds/funds.service';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { FcmService } from '../fcm/fcm.service';
       PresentImageEntity,
       FundingEntity,
     ]),
+    RedisModule,
   ],
   controllers: [PresentsController],
   providers: [
@@ -28,6 +31,7 @@ import { FcmService } from '../fcm/fcm.service';
     AuthService,
     UsersService,
     FcmService,
+    RedisService,
     JwtService,
   ],
 })

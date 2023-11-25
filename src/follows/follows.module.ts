@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -8,17 +8,19 @@ import { FollowEntity } from '../entities/follow.entity';
 import { UsersService } from '../users/users.service';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, FollowEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, FollowEntity]), RedisModule],
   controllers: [FollowsController],
   providers: [
     FollowsService,
     AuthService,
     UsersService,
     JwtService,
-    Logger,
     FcmService,
+    RedisService,
   ],
 })
 export class FollowsModule {}

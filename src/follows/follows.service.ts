@@ -9,6 +9,7 @@ import { FollowRequestDto } from './dto/follow.request.dto';
 import { UsersService } from '../users/users.service';
 import { AuthService } from '../auth/auth.service';
 import { FcmService } from '../fcm/fcm.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class FollowsService {
@@ -20,6 +21,7 @@ export class FollowsService {
     private authService: AuthService,
     private usersService: UsersService,
     private fcmService: FcmService,
+    private redisService: RedisService,
   ) {}
 
   async createFollow(follower: UserEntity, user: UserEntity): Promise<void> {
@@ -51,7 +53,7 @@ export class FollowsService {
     // 팔로우 할 사람
     const follower = await this.usersService.findUser('id', followingId, null);
 
-    const fcmToken = await this.authService.getFcmToken(follower.id);
+    const fcmToken = await this.redisService.getFcmToken(follower.id);
 
     if (fcmToken && follower.alarm) {
       const isFollow = await this.followRepository.findOne({
@@ -94,7 +96,7 @@ export class FollowsService {
       null,
     );
 
-    const fcmToken = await this.authService.getFcmToken(follower.id);
+    const fcmToken = await this.redisService.getFcmToken(follower.id);
 
     if (fcmToken && user.alarm) {
       const isFollow = await this.followRepository.findOne({
