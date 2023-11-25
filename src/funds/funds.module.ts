@@ -13,6 +13,7 @@ import { AuthService } from '../auth/auth.service';
 import { FcmService } from '../fcm/fcm.service';
 import { RedisService } from '../redis/redis.service';
 import { RedisModule } from '../redis/redis.module';
+import { SlackService } from '../slack/slack.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RedisModule } from '../redis/redis.module';
     JwtService,
     FcmService,
     RedisService,
+    SlackService,
   ],
 })
 export class FundsModule {}

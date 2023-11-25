@@ -9,10 +9,16 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import customErrorCode from './custom.error.code';
-import { SlackApiClient } from '../utils/slack.api.client';
+import { SlackService } from '../slack/slack.service';
 
 @Catch()
 export class CustomErrorFilter implements ExceptionFilter {
+  private slackService: SlackService;
+
+  constructor() {
+    this.slackService = new SlackService();
+  }
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -84,11 +90,7 @@ export class CustomErrorFilter implements ExceptionFilter {
         code: errors.code,
       });
     } else {
-      const slackClient = new SlackApiClient();
-
-      (async () => {
-        await slackClient.fatalError(exception.message);
-      })();
+      this.slackService.fatalError(exception.message);
 
       response.status(500).json({
         statusCode: 500,

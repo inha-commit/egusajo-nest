@@ -16,10 +16,10 @@ import { PresentsModule } from './presents/presents.module';
 import { validationSchema } from './config/validationSchema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 import { CustomErrorFilter } from './type/custom.error.filter';
-import { SlackApiClient } from './utils/slack.api.client';
 import { FundsModule } from './funds/funds.module';
 import { FcmModule } from './fcm/fcm.module';
 import { RedisModule } from './redis/redis.module';
+import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [
@@ -47,17 +47,17 @@ import { RedisModule } from './redis/redis.module';
       }),
       inject: [ConfigService],
     }),
+    SlackModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     Logger,
-    SlackApiClient,
     {
       provide: APP_FILTER,
       useClass: CustomErrorFilter,
     },
   ],
-  exports: [SlackApiClient, RedisModule],
+  exports: [RedisModule],
 })
 export class AppModule {}

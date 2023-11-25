@@ -2,24 +2,22 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken, NicknameValidationResponse, Tokens } from '../type/type';
 import customErrorCode from '../type/custom.error.code';
-import { SlackApiClient } from '../utils/slack.api.client';
+
 import { SignupRequestDto } from './dto/signup.request.dto';
 import { SigninRequestDto } from './dto/signin.request.dto';
 import { NicknameValidationRequestDto } from './dto/nicknameValidation.request.dto';
 import { UsersService } from '../users/users.service';
 import { RedisService } from '../redis/redis.service';
+import { SlackService } from '../slack/slack.service';
 
 @Injectable()
 export class AuthService {
-  private slackClient: SlackApiClient;
-
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
     private redisService: RedisService,
-  ) {
-    this.slackClient = new SlackApiClient();
-  }
+    private slackSevice: SlackService,
+  ) {}
 
   /**
    * 로그인
@@ -69,7 +67,7 @@ export class AuthService {
 
     await this.redisService.saveRedisFcmToken(user.id, fcmId);
 
-    await this.slackClient.newUser();
+    await this.slackSevice.newUser();
 
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);

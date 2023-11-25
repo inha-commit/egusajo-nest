@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { RedisService } from '../redis/redis.service';
 import { RedisModule } from '../redis/redis.module';
+import { SlackService } from '../slack/slack.service';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { RedisModule } from '../redis/redis.module';
     RedisModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, RedisService],
+  providers: [AuthService, UsersService, RedisService, SlackService],
 })
 export class AuthModule {}
