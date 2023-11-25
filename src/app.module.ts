@@ -18,7 +18,7 @@ import { TypeormConfigService } from './config/typeorm.config.service';
 import { CustomErrorFilter } from './type/custom.error.filter';
 import { SlackApiClient } from './utils/slack.api.client';
 import { FundsModule } from './funds/funds.module';
-import { FcmApiClient } from './utils/fcm.api.client';
+import { FcmModule } from './fcm/fcm.module';
 
 @Module({
   imports: [
@@ -28,6 +28,7 @@ import { FcmApiClient } from './utils/fcm.api.client';
     PresentsModule,
     ImagesModule,
     FundsModule,
+    FcmModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
@@ -50,7 +51,6 @@ import { FcmApiClient } from './utils/fcm.api.client';
     AppService,
     Logger,
     SlackApiClient,
-    FcmApiClient,
     {
       provide: APP_FILTER,
       useClass: CustomErrorFilter,

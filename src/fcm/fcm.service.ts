@@ -1,26 +1,17 @@
+import { Injectable, Logger } from '@nestjs/common';
 import admin from 'firebase-admin';
-import { Logger } from '@nestjs/common';
+import { FcmMessage } from '../type/type';
 
-type FcmMessage = {
-  data: {
-    title: string; // 알림 메세지 제목
-    body: string; // 알림 메세지 내용
-    code: string; // 알림 메세지 구분 코드
-  };
-  token: string; // 사용자 Fcm Token
-};
-
-export class FcmApiClient {
-  private credential;
-
-  private readonly logger: Logger;
+@Injectable()
+export class FcmService {
+  private logger: Logger;
 
   constructor() {
     this.logger = new Logger();
 
     const { privateKey } = JSON.parse(process.env.FCM_CREDENTIAL_PRIVATE_KEY);
 
-    this.credential = {
+    const credential = {
       type: process.env.FCM_CREDENTIAL_TYPE,
       project_id: process.env.FCM_CREDENTIAL_PROJECT_ID,
       private_key_id: process.env.FCM_CREDENTIAL_PRIVATE_KEY_ID,
@@ -37,7 +28,7 @@ export class FcmApiClient {
 
     if (admin.apps.length === 0) {
       admin.initializeApp({
-        credential: admin.credential.cert(this.credential as unknown),
+        credential: admin.credential.cert(credential as unknown),
       });
     }
   }
@@ -56,7 +47,7 @@ export class FcmApiClient {
 
   private async sendMessage(message: FcmMessage) {
     try {
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV === 'development') {
         await admin.messaging().send(message);
       }
     } catch (error) {

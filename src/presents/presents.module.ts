@@ -10,6 +10,7 @@ import { FundingEntity } from '../entities/funding.entity';
 import { UsersService } from '../users/users.service';
 import { FundsService } from '../funds/funds.service';
 import { AuthService } from '../auth/auth.service';
+import { FcmService } from '../fcm/fcm.service';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthService } from '../auth/auth.service';
     FundsService,
     AuthService,
     UsersService,
+    FcmService,
     JwtService,
   ],
 })

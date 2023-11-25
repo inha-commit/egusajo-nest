@@ -10,6 +10,7 @@ import { FundingEntity } from '../entities/funding.entity';
 import { JwtService } from '@nestjs/jwt';
 import { PresentsService } from '../presents/presents.service';
 import { AuthService } from '../auth/auth.service';
+import { FcmService } from '../fcm/fcm.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuthService } from '../auth/auth.service';
     PresentsService,
     UsersService,
     JwtService,
+    FcmService,
   ],
 })
 export class FundsModule {}

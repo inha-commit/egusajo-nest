@@ -10,14 +10,13 @@ import { UserEntity } from '../entities/user.entity';
 import { CreateFundDAO } from '../type/type';
 import { ModelConverter } from '../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
-import { FcmApiClient } from '../utils/fcm.api.client';
 import { AuthService } from '../auth/auth.service';
 import Redis from '../utils/redis.client';
 import { dateToKoreaString, stringDateToKoreaString } from '../hooks/date';
+import { FcmService } from '../fcm/fcm.service';
 
 @Injectable()
 export class FundsService {
-  private fcmApiClient: FcmApiClient;
   private redis: any;
 
   constructor(
@@ -30,10 +29,9 @@ export class FundsService {
     private authService: AuthService,
     private usersService: UsersService,
     private presentsService: PresentsService,
+    private fcmService: FcmService,
     private dataSource: DataSource,
   ) {
-    this.fcmApiClient = new FcmApiClient();
-
     this.redis = Redis.getInstance().getClient();
   }
 
@@ -155,7 +153,7 @@ export class FundsService {
       const fcmToken = await this.authService.getFcmToken(present.User.id);
 
       if (fcmToken && present.User.alarm) {
-        this.fcmApiClient.sendNewFundingNotification(
+        this.fcmService.sendNewFundingNotification(
           user.nickname,
           cost,
           fcmToken,
@@ -164,7 +162,7 @@ export class FundsService {
 
       // 완료된 사람에게 알람 보내기
       if (total_complete && fcmToken && present.User.alarm) {
-        this.fcmApiClient.sendCompleteFundingNotification(fcmToken);
+        this.fcmService.sendCompleteFundingNotification(fcmToken);
       }
 
       await queryRunner.commitTransaction();

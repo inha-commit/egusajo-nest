@@ -8,12 +8,10 @@ import { FollowEntity } from '../entities/follow.entity';
 import { FollowRequestDto } from './dto/follow.request.dto';
 import { UsersService } from '../users/users.service';
 import { AuthService } from '../auth/auth.service';
-import { FcmApiClient } from '../utils/fcm.api.client';
+import { FcmService } from '../fcm/fcm.service';
 
 @Injectable()
 export class FollowsService {
-  private fcmApiClient: FcmApiClient;
-
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
@@ -21,9 +19,8 @@ export class FollowsService {
     private followRepository: Repository<FollowEntity>,
     private authService: AuthService,
     private usersService: UsersService,
-  ) {
-    this.fcmApiClient = new FcmApiClient();
-  }
+    private fcmService: FcmService,
+  ) {}
 
   async createFollow(follower: UserEntity, user: UserEntity): Promise<void> {
     const follow = new FollowEntity();
@@ -66,9 +63,9 @@ export class FollowsService {
 
       // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
       if (isFollow) {
-        this.fcmApiClient.sendFollowAcceptNotification(user.nickname, fcmToken);
+        this.fcmService.sendFollowAcceptNotification(user.nickname, fcmToken);
       } else {
-        this.fcmApiClient.sendNewFollowerNotification(user.nickname, fcmToken);
+        this.fcmService.sendNewFollowerNotification(user.nickname, fcmToken);
       }
     }
 
@@ -109,9 +106,9 @@ export class FollowsService {
 
       // 이미 이 사람이 나를 팔로우 하고 있다면 fcm 메세지 다르게
       if (isFollow) {
-        this.fcmApiClient.sendFollowAcceptNotification(user.nickname, fcmToken);
+        this.fcmService.sendFollowAcceptNotification(user.nickname, fcmToken);
       } else {
-        this.fcmApiClient.sendNewFollowerNotification(user.nickname, fcmToken);
+        this.fcmService.sendNewFollowerNotification(user.nickname, fcmToken);
       }
     }
 

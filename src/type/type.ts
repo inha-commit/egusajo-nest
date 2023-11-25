@@ -161,6 +161,16 @@ type FundWithUser = {
   user: User;
 };
 
+// fcm
+type FcmMessage = {
+  data: {
+    title: string; // 알림 메세지 제목
+    body: string; // 알림 메세지 내용
+    code: string; // 알림 메세지 구분 코드
+  };
+  token: string; // 사용자 Fcm Token
+};
+
 export type {
   AccessToken,
   Tokens,
@@ -183,4 +193,5 @@ export type {
   CreateFundDAO,
   PresentWithFund,
   FundWithUser,
+  FcmMessage,
 };
