@@ -8,7 +8,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import customErrorCode from './custom.error.code';
+import customErrorCode from '../type/custom.error.code';
 import { SlackService } from '../slack/slack.service';
 
 @Catch()
