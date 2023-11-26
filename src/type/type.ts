@@ -46,10 +46,14 @@ type UpdateUserDAO = {
   name: string;
   nickname: string;
   birthday: string;
-  bank: string;
-  account: string;
+  // bank: string;
+  // account: string;
   profileImgSrc: string;
   alarm: boolean;
+};
+
+type UpdateMyInfoResponse = {
+  success: boolean;
 };
 
 type DeleteMyInfoResponse = {
@@ -178,6 +182,7 @@ export type {
   User,
   CreateUserDAO,
   UpdateUserDAO,
+  UpdateMyInfoResponse,
   DeleteMyInfoResponse,
   Follower,
   FollowResponse,
