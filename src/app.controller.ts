@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AccessTokenGuard } from './guard/access.token.guard';
+import { AccessTokenGuard } from './guards/access.token.guard';
 import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller()

@@ -8,19 +8,19 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeormConfigService } from './config/typeorm.config.service';
 
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { FollowsModule } from './follows/follows.module';
-import { ImagesModule } from './images/images.module';
-import { PresentsModule } from './presents/presents.module';
-import { FundsModule } from './funds/funds.module';
-import { FcmModule } from './fcm/fcm.module';
-import { RedisModule } from './redis/redis.module';
-import { SlackModule } from './slack/slack.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { FollowsModule } from './modules/follows/follows.module';
+import { ImagesModule } from './modules/images/images.module';
+import { PresentsModule } from './modules/presents/presents.module';
+import { FundsModule } from './modules/funds/funds.module';
+import { FcmModule } from './modules/fcm/fcm.module';
+import { RedisModule } from './modules/redis/redis.module';
+import { SlackModule } from './modules/slack/slack.module';
 
 import { validationSchema } from './config/validationSchema';
 
-import { CustomErrorFilter } from './filter/custom.error.filter';
+import { CustomErrorFilter } from './filters/custom.error.filter';
 
 @Module({
   imports: [
