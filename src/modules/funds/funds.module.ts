@@ -7,13 +7,9 @@ import { UserEntity } from '../../entities/user.entity';
 import { PresentEntity } from '../../entities/present.entity';
 import { PresentImageEntity } from '../../entities/presentImage.entity';
 import { FundingEntity } from '../../entities/funding.entity';
-import { JwtService } from '@nestjs/jwt';
-import { PresentsService } from '../presents/presents.service';
-import { AuthService } from '../auth/auth.service';
-import { FcmService } from '../fcm/fcm.service';
-import { RedisService } from '../redis/redis.service';
-import { RedisModule } from '../redis/redis.module';
-import { SlackService } from '../slack/slack.service';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
+import { PresentsModule } from '../presents/presents.module';
 
 @Module({
   imports: [
@@ -23,18 +19,11 @@ import { SlackService } from '../slack/slack.service';
       PresentImageEntity,
       FundingEntity,
     ]),
-    RedisModule,
+    AuthModule,
+    UsersModule,
+    PresentsModule,
   ],
   controllers: [FundsController],
-  providers: [
-    FundsService,
-    AuthService,
-    PresentsService,
-    UsersService,
-    JwtService,
-    FcmService,
-    RedisService,
-    SlackService,
-  ],
+  providers: [FundsService],
 })
 export class FundsModule {}

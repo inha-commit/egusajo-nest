@@ -1,7 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -21,6 +20,7 @@ import { SlackModule } from './modules/slack/slack.module';
 import { validationSchema } from './config/validationSchema';
 
 import { CustomErrorFilter } from './filters/custom.error.filter';
+import { GlobalJwtModule } from './modules/jwt/jwt.module';
 
 @Module({
   imports: [
@@ -32,6 +32,8 @@ import { CustomErrorFilter } from './filters/custom.error.filter';
     FundsModule,
     FcmModule,
     RedisModule,
+    SlackModule,
+    GlobalJwtModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       isGlobal: true,
@@ -41,14 +43,6 @@ import { CustomErrorFilter } from './filters/custom.error.filter';
       imports: [ConfigModule],
       useClass: TypeormConfigService,
     }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-      }),
-      inject: [ConfigService],
-    }),
-    SlackModule,
   ],
   controllers: [AppController],
   providers: [
@@ -59,6 +53,5 @@ import { CustomErrorFilter } from './filters/custom.error.filter';
       useClass: CustomErrorFilter,
     },
   ],
-  exports: [RedisModule],
 })
 export class AppModule {}
