@@ -40,7 +40,7 @@ export class PresentEntity {
   money: number;
 
   // 펀딩 마감일
-  @Column('date')
+  @Column('varchar')
   deadline: string;
 
   // 대표 이미지

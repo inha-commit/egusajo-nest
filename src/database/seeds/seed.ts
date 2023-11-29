@@ -7,6 +7,58 @@ import { FollowEntity } from '../../entities/follow.entity';
 import { FundingEntity } from '../../entities/funding.entity';
 
 export default class UserSeeder implements Seeder {
+  private async generatePresents(users, presentFactory) {
+    return Promise.all(
+      users.map(async (user) => {
+        const present = await presentFactory.make({
+          User: user,
+          shortComment: `${user.nickname}의 선물`,
+        });
+        return present;
+      }),
+    );
+  }
+
+  private async generatePresentImages(presents, presentImageFactory) {
+    return Promise.all(
+      presents.map(async (present) => {
+        const presentImages = await Promise.all(
+          Array(5)
+            .fill(0)
+            .map(async () => {
+              return presentImageFactory.make({
+                Present: present,
+              });
+            }),
+        );
+
+        return presentImages;
+      }),
+    );
+  }
+
+  private async generateFundings(presents, users, fundingFactory) {
+    return Promise.all(
+      presents.map(async (present) => {
+        const sender = users[Math.floor(Math.random() * users.length)];
+
+        const fundings = await Promise.all(
+          Array(20)
+            .fill(0)
+            .map(async () => {
+              return fundingFactory.make({
+                Present: present,
+                Receiver: present.User,
+                Sender: sender,
+              });
+            }),
+        );
+
+        return fundings;
+      }),
+    );
+  }
+
   public async run(
     dataSource: DataSource,
     factoryManager: SeederFactoryManager,
@@ -22,85 +74,28 @@ export default class UserSeeder implements Seeder {
     const fundingFactory = factoryManager.get(FundingEntity);
     const presentImageFactory = factoryManager.get(PresentImageEntity);
 
-    const users = await userFactory.saveMany(200);
+    const users = await userFactory.saveMany(1000);
 
-    // 100번 유저에 대해 모든 유저 팔로우하기
-    const followings = [];
-    await (async () => {
-      for (let i = 2; i < 10; i++) {
-        const follow = await followFactory.make({
-          followingId: i,
-          followerId: 1,
-        });
-        followings.push(follow);
-      }
-    })();
+    // Followings 삽입
+    await followFactory.saveMany(10000);
 
-    await followRepository.save(followings);
-
-    const followers = [];
-    await (async () => {
-      for (let i = 5; i < 15; i++) {
-        const follow = await followFactory.make({
-          followingId: 1,
-          followerId: i,
-        });
-        followers.push(follow);
-      }
-    })();
-
-    await followRepository.save(followers);
-
-    // Present 삽입
-    const presents = [];
-    await Promise.all(
-      users.map(async (user) => {
-        const present = await presentFactory.make({
-          User: user,
-          shortComment: `${user.nickname}의 선물`,
-        });
-
-        presents.push(present);
-      }),
-    );
+    // Presents 삽입
+    const presents = await this.generatePresents(users, presentFactory);
     await presentRepository.save(presents);
 
-    // presentImages 삽입
-    await Promise.all(
-      presents.map(async (present) => {
-        const presentImages = await Promise.all(
-          Array(5)
-            .fill(0)
-            .map(async () => {
-              return presentImageFactory.make({
-                Present: present,
-              });
-            }),
-        );
-
-        await presentImageRepository.save(presentImages);
-      }),
+    // PresentImages 삽입
+    const presentImages = await this.generatePresentImages(
+      presents,
+      presentImageFactory,
     );
+    await presentImageRepository.save(presentImages.flat());
 
-    // Funding 삽입
-    await Promise.all(
-      presents.map(async (present) => {
-        const Sender = users[Math.floor(Math.random() * users.length)];
-
-        const fundings = await Promise.all(
-          Array(20)
-            .fill(0)
-            .map(async () => {
-              return fundingFactory.make({
-                Present: present,
-                Receiver: present.User,
-                Sender: Sender,
-              });
-            }),
-        );
-
-        await fundingRepository.save(fundings);
-      }),
+    // Fundings 삽입
+    const fundings = await this.generateFundings(
+      presents,
+      users,
+      fundingFactory,
     );
+    await fundingRepository.save(fundings.flat());
   }
 }

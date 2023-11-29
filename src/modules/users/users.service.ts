@@ -13,12 +13,15 @@ import {
   UpdateMyInfoResponse,
 } from '../../type/type';
 import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
+import { FollowEntity } from '../../entities/follow.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(FollowEntity)
+    private followRepository: Repository<FollowEntity>,
   ) {}
 
   /**
@@ -144,16 +147,12 @@ export class UsersService {
    * @param userId
    */
   async getUserById(userId: number, id: number): Promise<User> {
-    const user = await this.findUser('id', id, [
-      'Followings',
-      'Funding',
-      'Funded',
-    ]);
+    const user = await this.findUser('id', id, ['Funding', 'Funded']);
 
     // 내가 팔로잉 하고 있는지 여부
-    const isFollowing = user.Followings.some(
-      (follower) => follower.id === userId,
-    );
+    const isFollowing = await this.followRepository.exist({
+      where: { followingId: id, followerId: userId },
+    });
 
     // 선물게시물 개수, 펀딩 개수
     const fundingNum = user.Funding.length;
