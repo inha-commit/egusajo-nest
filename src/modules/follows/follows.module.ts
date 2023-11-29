@@ -1,16 +1,19 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../entities/user.entity';
-import { JwtService } from '@nestjs/jwt';
 import { FollowsController } from './follows.controller';
 import { FollowsService } from './follows.service';
 import { FollowEntity } from '../../entities/follow.entity';
-import { UsersService } from '../users/users.service';
-import { AuthService } from '../auth/auth.service';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, FollowEntity])],
+  imports: [
+    TypeOrmModule.forFeature([UserEntity, FollowEntity]),
+    AuthModule,
+    UsersModule,
+  ],
   controllers: [FollowsController],
-  providers: [FollowsService, AuthService, UsersService, JwtService],
+  providers: [FollowsService],
 })
 export class FollowsModule {}

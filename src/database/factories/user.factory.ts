@@ -1,11 +1,11 @@
 import { setSeederFactory } from 'typeorm-extension';
 import { UserEntity } from '../../entities/user.entity';
 
-function getRandomDate() {
+function getRandomBirthday() {
   const year = Math.floor(Math.random() * (2023 - 1900) + 1900); // 1900년부터 2022년까지 무작위 연도 생성
   const month = String(Math.floor(Math.random() * 12 + 1)).padStart(2, '0'); // 1부터 12까지 무작위 월 생성
   const day = String(Math.floor(Math.random() * 31 + 1)).padStart(2, '0'); // 1부터 31까지 무작위 일 생성
-  return new Date(`${year}/${month}/${day}`);
+  return `${year}/${month}/${day}`;
 }
 
 export default setSeederFactory(UserEntity, (faker) => {
@@ -13,7 +13,7 @@ export default setSeederFactory(UserEntity, (faker) => {
   user.snsId = faker.string.uuid();
   user.nickname = faker.internet.userName();
   user.name = faker.person.fullName();
-  user.birthday = '1998/09/14';
+  user.birthday = getRandomBirthday();
   user.bank = 'Hana';
   user.account = faker.finance.accountNumber();
   user.profileImgSrc = faker.image.avatar();
