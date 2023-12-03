@@ -184,16 +184,18 @@ export class UsersService {
 
     const followersWithFlag: Follower[] = [];
 
-    users.map(async (user) => {
-      const isFollowing = await this.followRepository.exist({
-        where: { followingId: user.id, followerId: userId },
-      });
+    await Promise.all(
+      users.map(async (user) => {
+        const isFollowing = await this.followRepository.exist({
+          where: { followingId: user.id, followerId: userId },
+        });
 
-      followersWithFlag.push({
-        ...ModelConverter.user(user),
-        isFollowing: isFollowing,
-      });
-    });
+        followersWithFlag.push({
+          ...ModelConverter.user(user),
+          isFollowing: isFollowing,
+        });
+      }),
+    );
 
     return followersWithFlag;
   }
