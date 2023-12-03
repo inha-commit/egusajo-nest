@@ -126,7 +126,7 @@ type PresentWithFund = {
   present: Present;
   presentImages: string[];
   fundings: FundWithUser[];
-  isParticipate: boolean;
+  isParticipate: 'TRUE' | 'FALSE' | 'MINE';
 };
 
 type CreatePresentResponse = {

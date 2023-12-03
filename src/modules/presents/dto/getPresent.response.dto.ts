@@ -215,10 +215,10 @@ export class GetPresentResponseDto {
 
   @ApiProperty({
     name: 'isParticipate',
-    type: Boolean,
+    type: 'string',
     description: '내가 해당 선물에 펀딩 했는지 정보',
   })
-  readonly isParticipate: boolean;
+  readonly isParticipate: 'TRUE' | 'FALSE' | 'MINE';
 
   @ApiProperty({
     name: 'presentImages',
