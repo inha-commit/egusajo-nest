@@ -95,7 +95,7 @@ export class CustomErrorFilter implements ExceptionFilter {
       response.status(500).json({
         statusCode: 500,
         message: 'UNCATCHED ERROR',
-        description: exception.message ? exception.message : null,
+        description: exception.message ? exception.message : '알수 없는 에러',
         code: customErrorCode.UNCATCHED_ERROR,
       });
     }

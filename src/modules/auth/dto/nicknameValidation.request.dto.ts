@@ -5,6 +5,6 @@ export class NicknameValidationRequestDto {
   @ApiProperty({
     description: '중복확인 할 닉네임',
   })
-  @IsString()
+  @IsString({ message: '닉네임은 문자열이여야 합니다!' })
   readonly nickname: string;
 }
