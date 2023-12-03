@@ -52,7 +52,7 @@ export class ImagesController {
   })
   @Post('/')
   @UseInterceptors(
-    FilesInterceptor('images', 10, {
+    FilesInterceptor('images', 5, {
       limits: {
         fileSize: 10 * 1024 * 1024,
       },
