@@ -214,16 +214,16 @@ export class UsersService {
     const user = await this.findUser('id', userId, null);
 
     // validation이 있지만 닉네임 중복 다시 체크
-    const nicknameCheck = await this.userRepository.findOne({
-      where: { nickname: nickname },
-    });
-
-    if (nicknameCheck) {
-      throw new BadRequestException({
-        message: '이미 사용중인 닉네임 입니다!',
-        code: customErrorCode.DUPLICATE_NICKNAME,
-      });
-    }
+    // const nicknameCheck = await this.userRepository.findOne({
+    //   where: { nickname: nickname },
+    // });
+    //
+    // if (nicknameCheck) {
+    //   throw new BadRequestException({
+    //     message: '이미 사용중인 닉네임 입니다!',
+    //     code: customErrorCode.DUPLICATE_NICKNAME,
+    //   });
+    // }
 
     await this.updateUser(user, data);
 
