@@ -8,7 +8,6 @@ import customErrorCode from '../../filters/custom.error.code';
 import {
   CreatePresentDAO,
   CreatePresentResponse,
-  DeletePresentResponse,
   PresentWithFund,
   PresentWithUser,
   UpdatePresentDAO,
@@ -62,7 +61,7 @@ export class PresentsService {
       .getRepository(PresentEntity)
       .save({
         name: name,
-        productLink: productLink,
+        productLink: productLink === '' ? null : productLink,
         complete: false,
         goal: goal,
         money: 0,
@@ -149,7 +148,6 @@ export class PresentsService {
   }
 
   async updatePresent(
-    user: UserEntity,
     present: PresentEntity,
     updatePresentDAO: UpdatePresentDAO,
     queryRunner: QueryRunner,
@@ -181,6 +179,36 @@ export class PresentsService {
     );
 
     await queryRunner.manager.getRepository(PresentEntity).save(present);
+  }
+
+  async updatePresentMoney(
+    present: PresentEntity,
+    cost: number,
+    type: 'plus' | 'minus',
+    queryRunner: QueryRunner,
+  ): Promise<PresentEntity> {
+    let total_money = present.money;
+
+    let total_complete = present.complete;
+
+    if (type === 'plus') {
+      total_money += cost;
+
+      if (total_money >= present.goal) {
+        total_complete = true;
+      }
+    } else {
+      total_money -= cost;
+
+      if (total_money < present.goal) {
+        total_complete = false;
+      }
+    }
+
+    present.money = total_money;
+    present.complete = total_complete;
+
+    return queryRunner.manager.getRepository(PresentEntity).save(present);
   }
 
   async deletePresentImages(
@@ -418,7 +446,7 @@ export class PresentsService {
     await queryRunner.startTransaction();
 
     try {
-      await this.updatePresent(user, present, data, queryRunner);
+      await this.updatePresent(present, data, queryRunner);
 
       await queryRunner.commitTransaction();
 
@@ -428,32 +456,5 @@ export class PresentsService {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  /**
-   * 선물 게시물 삭제
-   * @param userId
-   * @param presentId
-   */
-  async deletePresent(
-    userId: number,
-    presentId: number,
-  ): Promise<DeletePresentResponse> {
-    const user = await this.usersService.findUser('id', userId, null);
-
-    const present = await this.findPresent('id', presentId, ['User']);
-
-    if (present.User.id !== user.id) {
-      throw new BadRequestException({
-        message: '자신의 게시물만 삭제할 수 있습니다',
-        code: customErrorCode.PRESENT_NOT_MINE,
-      });
-    }
-
-    // TODO: 돈이 들어 있다면 게시물 취소는 안되게 해야함
-
-    await this.presentRepository.delete({ id: presentId });
-
-    return { success: true };
   }
 }

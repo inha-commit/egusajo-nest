@@ -17,7 +17,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetFundingHistoryReponseDto } from './dto/getFundingHistory.response.dto';
-import { CreatePresentResponseDto } from '../presents/dto/createPresent.response.dto';
 import customErrorCode from '../../filters/custom.error.code';
 
 @ApiTags('funds')

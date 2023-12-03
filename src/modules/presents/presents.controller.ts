@@ -33,6 +33,7 @@ import { GetPresentResponseDto } from './dto/getPresent.response.dto';
 import { CreateFundingResponseDto } from './dto/createFunding.response.dto';
 import { GetPresentsResponseDto } from './dto/getPresents.response.dto';
 import { FundsService } from '../funds/funds.service';
+import { DeleteFundingResponseDto } from './dto/deleteFunding.response.dto';
 
 @ApiTags('presents')
 @Controller('presents')
@@ -411,91 +412,90 @@ export class PresentsController {
     return new UpdatePresentResponseDto(response);
   }
 
-  @ApiOperation({
-    summary: '특정 선물 게시물 삭제하기',
-    description: 'DeletePresentResponseDto',
-  })
-  @ApiHeader({
-    name: 'access-token',
-    description: '발급된 access-token',
-    required: true,
-  })
-  @ApiOkResponse({
-    type: DeletePresentResponseDto,
-  })
-  @ApiResponse({
-    status: 1002,
-    description: '회원가입 되지 않은 유저',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 400,
-          message: 'BAD REQUEST ERROR',
-          description: '회원가입 되지 않은 유저입니다!',
-          code: 1002,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 7000,
-    description: '절못된 parameter 전송',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 400,
-          message: 'BAD REQUEST ERROR',
-          description: 'presentId는 number type이어야 합니다!',
-          code: 7000,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 4000,
-    description: '존재하지 않는 게시글에 접근할 때',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 400,
-          message: 'BAD REQUEST ERROR',
-          description: '존재하지 않는 게시글 입니다!',
-          code: 4000,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 4003,
-    description: '남의 게시물을 삭제하려는 경우',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 400,
-          message: 'BAD REQUEST ERROR',
-          description: '자신의 게시물만 삭제할 수 있습니다',
-          code: 4003,
-        },
-      },
-    },
-  })
-  @UseGuards(AccessTokenGuard)
-  @Delete('/:presentId')
-  async deletePresent(@Req() request, @Param('presentId') presentId: string) {
-    if (!presentId || typeof parseInt(presentId) !== 'number') {
-      throw new BadRequestException({
-        message: 'presentId는 number type이어야 합니다!',
-        code: customErrorCode.INVALID_PARAM,
-      });
-    }
-
-    const response = await this.presentsService.deletePresent(
-      request.userId,
-      parseInt(presentId),
-    );
-
-    return new DeletePresentResponseDto(response);
-  }
+  // @ApiOperation({
+  //   summary: '특정 선물 게시물 삭제하기',
+  // })
+  // @ApiHeader({
+  //   name: 'access-token',
+  //   description: '발급된 access-token',
+  //   required: true,
+  // })
+  // @ApiOkResponse({
+  //   type: DeletePresentResponseDto,
+  // })
+  // @ApiResponse({
+  //   status: 1002,
+  //   description: '회원가입 되지 않은 유저',
+  //   content: {
+  //     'application/json': {
+  //       example: {
+  //         statusCode: 400,
+  //         message: 'BAD REQUEST ERROR',
+  //         description: '회원가입 되지 않은 유저입니다!',
+  //         code: 1002,
+  //       },
+  //     },
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 7000,
+  //   description: '절못된 parameter 전송',
+  //   content: {
+  //     'application/json': {
+  //       example: {
+  //         statusCode: 400,
+  //         message: 'BAD REQUEST ERROR',
+  //         description: 'presentId는 number type이어야 합니다!',
+  //         code: 7000,
+  //       },
+  //     },
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 4000,
+  //   description: '존재하지 않는 게시글에 접근할 때',
+  //   content: {
+  //     'application/json': {
+  //       example: {
+  //         statusCode: 400,
+  //         message: 'BAD REQUEST ERROR',
+  //         description: '존재하지 않는 게시글 입니다!',
+  //         code: 4000,
+  //       },
+  //     },
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 4003,
+  //   description: '남의 게시물을 삭제하려는 경우',
+  //   content: {
+  //     'application/json': {
+  //       example: {
+  //         statusCode: 400,
+  //         message: 'BAD REQUEST ERROR',
+  //         description: '자신의 게시물만 삭제할 수 있습니다',
+  //         code: 4003,
+  //       },
+  //     },
+  //   },
+  // })
+  // @UseGuards(AccessTokenGuard)
+  // @Delete('/:presentId')
+  // async deletePresent(@Req() request, @Param('presentId') presentId: string) {
+  //   if (!presentId || typeof parseInt(presentId) !== 'number') {
+  //     throw new BadRequestException({
+  //       message: 'presentId는 number type이어야 합니다!',
+  //       code: customErrorCode.INVALID_PARAM,
+  //     });
+  //   }
+  //
+  //   const response = await this.presentsService.deletePresent(
+  //     request.userId,
+  //     parseInt(presentId),
+  //   );
+  //
+  //   return new DeletePresentResponseDto(response);
+  // }
 
   @ApiOperation({
     summary: '선물에 대해 펀딩하기',
@@ -596,6 +596,43 @@ export class PresentsController {
   @ApiOperation({
     summary: '펀딩 취소하기',
   })
+  @ApiHeader({
+    name: 'access-token',
+    description: '발급된 access-token',
+    required: true,
+  })
+  @ApiOkResponse({
+    type: DeleteFundingResponseDto,
+  })
+  @ApiResponse({
+    status: 5003,
+    description: '종료된 선물의 펀딩을 삭제하는 경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '완료된 펀딩에 대해서는 취소할 수 없습니다!',
+          code: 5003,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 5002,
+    description: '자신의 펀딩이 아닌 펀딩을 취소하려 하는 경우',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 400,
+          message: 'BAD REQUEST ERROR',
+          description: '자신의 펀딩만 취소할 수 있습니다.',
+          code: 5004,
+        },
+      },
+    },
+  })
+  @UseGuards(AccessTokenGuard)
   @Delete('/:presentId/funds/:fundId')
   async deleteFunding(
     @Req() request,
