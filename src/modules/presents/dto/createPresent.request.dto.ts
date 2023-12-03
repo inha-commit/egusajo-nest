@@ -2,9 +2,11 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -12,27 +14,28 @@ export class CreatePresentRequestDto {
   @ApiProperty({
     description: '선물 이름',
   })
-  @IsString()
+  @IsString({ message: '선물 이름은 문자열이어야 합니다!' })
   readonly name: string;
 
   @ApiProperty({
     description: '선물 링크가 있다면 보내주세요',
   })
-  @IsString()
+  @IsString({ message: '선물 링크는 문자열이어야 합니다!' })
   readonly productLink: string;
 
   @ApiProperty({
     description: '목표 금액',
     example: 10000,
   })
-  @IsNumber()
+  @IsInt()
+  @Min(1000, { message: '목표금액은 1000원 이상 설장 하셔야 합니다!' })
   readonly goal: number;
 
   @ApiProperty({
     description: '목표 날짜 YYYY/MM/DD 형식으로 보내주세요',
     example: '1998/09/14',
   })
-  @IsString()
+  @IsString({ message: '날짜 형식은 문자열이어야 합니다!' })
   readonly deadline: string;
 
   @ApiProperty({
@@ -48,18 +51,18 @@ export class CreatePresentRequestDto {
   @ApiProperty({
     description: 'presentImages중 하나를 대표 이미지로 보내주세요',
   })
-  @IsString()
+  @IsString({ message: 'representImage 형식은 문자열이어야 합니다!' })
   readonly representImage: string;
 
   @ApiProperty({
     description: '선물 게시글 제목',
   })
-  @IsString()
+  @IsString({ message: '게시글 제목은 문자열이어야 합니다!' })
   readonly shortComment: string;
 
   @ApiProperty({
     description: '선물 게시글 내용',
   })
-  @IsString()
+  @IsString({ message: '게시글 내용은 문자열이어야 합니다!' })
   readonly longComment: string;
 }

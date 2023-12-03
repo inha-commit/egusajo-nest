@@ -7,12 +7,12 @@ export class SigninRequestDto {
     description: '카카오 snsId',
   })
   @Transform((value) => value.toString())
-  @IsString()
+  @IsString({ message: 'snsId는 문자열이여야 합니다!' })
   readonly snsId: string;
 
   @ApiProperty({
     description: 'fcmId',
   })
-  @IsString()
+  @IsString({ message: 'fcmId는 문자열이여야 합니다!' })
   readonly fcmId: string;
 }

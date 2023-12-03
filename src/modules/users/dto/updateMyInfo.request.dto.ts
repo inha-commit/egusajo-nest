@@ -6,14 +6,16 @@ export class UpdateMyInfoRequestDto {
     name: 'name',
     description: '사용자 이름',
   })
-  @MaxLength(30)
+  @IsString({ message: '이름은 문자열이어야 합니다!' })
+  @MaxLength(30, { message: '이름은 30자를 넘을 수 없습니다!' })
   public name: string;
 
   @ApiProperty({
     name: 'nickname',
     description: '사용자 닉네임',
   })
-  @MaxLength(30)
+  @IsString({ message: '닉네임은 문자열이어야 합니다!' })
+  @MaxLength(30, { message: '닉네임은 30자를 넘을 수 없습니다!' })
   public nickname: string;
 
   @ApiProperty({
@@ -21,7 +23,7 @@ export class UpdateMyInfoRequestDto {
     description: 'YYYY/MM/DD 형식으로 보내주세요',
     example: '1998/09/14',
   })
-  @IsString()
+  @IsString({ message: '생일 형식은 문자열이어야 합니다!' })
   public birthday: string;
 
   // @ApiProperty({

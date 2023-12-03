@@ -95,7 +95,7 @@ export class FundsService {
     });
   }
 
-  async Funding(
+  async funding(
     userId: number,
     presentId: number,
     data: CreateFundingRequestDto,
@@ -127,9 +127,9 @@ export class FundsService {
     }
 
     // 100원 이하의 금액의 경우에는 불가능하게함
-    if (cost < 100) {
+    if (cost < 1000) {
       throw new BadRequestException({
-        message: '금액은 최소 100원 이상이어야 합니다!',
+        message: '금액은 최소 1000원 이상이어야 합니다!',
         code: customErrorCode.FUNDING_MONEY_SHORT_FALL,
       });
     }

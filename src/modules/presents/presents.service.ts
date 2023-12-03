@@ -240,9 +240,9 @@ export class PresentsService {
 
     const user = await this.usersService.findUser('id', userId, null);
 
-    if (goal <= 0) {
+    if (goal < 1000) {
       throw new BadRequestException({
-        message: '목표 금액은 0원보다 높아야 합니다!',
+        message: '목표 금액은 1000원 이상이어야 합니다!',
         code: customErrorCode.PRESENT_GOAL_SHORT_FALL,
       });
     }

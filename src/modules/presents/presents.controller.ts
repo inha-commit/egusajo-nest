@@ -584,7 +584,7 @@ export class PresentsController {
       });
     }
 
-    const response = await this.fundsService.Funding(
+    const response = await this.fundsService.funding(
       parseInt(request.userId),
       parseInt(presentId),
       data,
