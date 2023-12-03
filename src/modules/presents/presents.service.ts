@@ -339,20 +339,26 @@ export class PresentsService {
       'Funding.Sender',
     ]);
 
-    // 대표이미지 빼고 보내기
-    const presentImages: string[] = [];
-    present.PresentImage.filter(
-      (presentImage) => presentImage.src !== present.representImage,
-    ).map((presentImage) => {
-      presentImages.push(presentImage.src);
-    });
+    const presentImages: string[] = present.PresentImage.map(
+      (presentImage) => presentImage.src,
+    );
+    // present.PresentImage.filter(
+    //   (presentImage) => presentImage.src !== present.representImage,
+    // ).map((presentImage) => {
+    //   presentImages.push(presentImage.src);
+    // });
 
-    // 내가 펀딩에 참여했는지 확인
-    let isParticipate = false;
+    // 내가 펀딩에 참여했는지 확인 TRUE | FALSE | MINE 으로 바꾸고 가기
+
+    let isParticipate: 'TRUE' | 'FALSE' | 'MINE' = 'TRUE';
+
+    if (present.User.id == userId) {
+      isParticipate = 'MINE';
+    }
 
     const fundings = present.Funding.map((funding) => {
       if (funding.Sender.id == userId) {
-        isParticipate = true;
+        isParticipate = 'FALSE';
       }
 
       return {
