@@ -165,6 +165,14 @@ type FundWithUser = {
   user: User;
 };
 
+type CreateFundResponse = {
+  success: true;
+};
+
+type DeleteFundResponse = {
+  success: true;
+};
+
 // fcm
 type FcmMessage = {
   data: {
@@ -199,4 +207,6 @@ export type {
   PresentWithFund,
   FundWithUser,
   FcmMessage,
+  CreateFundResponse,
+  DeleteFundResponse,
 };

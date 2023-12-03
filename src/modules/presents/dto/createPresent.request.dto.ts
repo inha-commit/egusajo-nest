@@ -16,11 +16,10 @@ export class CreatePresentRequestDto {
   readonly name: string;
 
   @ApiProperty({
-    description: '선물 링크가 있다면 보내주세요 없다면 null로 보내주세요',
+    description: '선물 링크가 있다면 보내주세요',
   })
-  @IsOptional()
   @IsString()
-  readonly productLink: string | null;
+  readonly productLink: string;
 
   @ApiProperty({
     description: '목표 금액',

@@ -7,7 +7,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { UserEntity } from '../../entities/user.entity';
-import { CreateFundDAO } from '../../type/type';
+import {
+  CreateFundDAO,
+  CreateFundResponse,
+  DeleteFundResponse,
+} from '../../type/type';
 import { ModelConverter } from '../../type/model.converter';
 import { PresentsService } from '../presents/presents.service';
 import { AuthService } from '../auth/auth.service';
@@ -76,7 +80,7 @@ export class FundsService {
     relations: string[] | null,
     skip: number,
     take: number,
-  ) {
+  ): Promise<FundingEntity[]> {
     return this.fundingRepository.find({
       where: { [property]: value, deletedAt: null },
       relations: relations,
@@ -85,11 +89,17 @@ export class FundsService {
     });
   }
 
+  async deleteFund(fundId: number, queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.delete(FundingEntity, {
+      id: fundId,
+    });
+  }
+
   async Funding(
     userId: number,
     presentId: number,
     data: CreateFundingRequestDto,
-  ) {
+  ): Promise<CreateFundResponse> {
     const { cost } = data;
 
     const user = await this.usersService.findUser('id', userId, null);
@@ -98,7 +108,15 @@ export class FundsService {
       'User',
     ]);
 
-    // 기한이 지난 선물게시물에 대해선 펀딩 불가
+    // 자신은 자신에게 펀딩이 불가능하게
+    if (userId === present.User.id) {
+      throw new BadRequestException({
+        message: '왜 자신에게 선물하려 하세요!',
+        code: customErrorCode.FUNDING_TO_ME,
+      });
+    }
+
+    // 기한이 지난 게시물에 대해선 펀딩 불가능하게함
     if (
       stringDateToKoreaString(present.deadline) < dateToKoreaString(new Date())
     ) {
@@ -108,7 +126,7 @@ export class FundsService {
       });
     }
 
-    // 금액은 100원 이상
+    // 100원 이하의 금액의 경우에는 불가능하게함
     if (cost < 100) {
       throw new BadRequestException({
         message: '금액은 최소 100원 이상이어야 합니다!',
@@ -120,6 +138,7 @@ export class FundsService {
       where: { PresentId: present.id, SenderId: userId, deletedAt: null },
     });
 
+    // 해당 펀딩에 참여한 경우에는 불가능하게함
     if (alreadyFund) {
       throw new BadRequestException({
         message: '이미 해당 펀딩에 참여하였습니다!',
@@ -134,21 +153,18 @@ export class FundsService {
     try {
       await this.createFund(data, present, user, present.User, queryRunner);
 
-      const total_money = present.money + cost;
-      let total_complete = present.complete;
+      await this.presentsService.updatePresentMoney(
+        present,
+        cost,
+        'plus',
+        queryRunner,
+      );
 
-      if (total_money >= present.goal) {
-        total_complete = true;
-      }
+      await queryRunner.commitTransaction();
 
-      present.money = total_money;
-      present.complete = total_complete;
-
-      await queryRunner.manager.getRepository(PresentEntity).save(present);
-
-      // 펀딩 받은 사람에게 알람 보내기
       const fcmToken = await this.redisService.getFcmToken(present.User.id);
 
+      // 펀딩 받은 사람에게 알람 보내기
       if (fcmToken && present.User.alarm) {
         this.fcmService.sendNewFundingNotification(
           user.nickname,
@@ -157,12 +173,10 @@ export class FundsService {
         );
       }
 
-      // 완료된 사람에게 알람 보내기
-      if (total_complete && fcmToken && present.User.alarm) {
+      // 펀딩 완료된 사람에게 알람 보내기
+      if (present.complete && fcmToken && present.User.alarm) {
         this.fcmService.sendCompleteFundingNotification(fcmToken);
       }
-
-      await queryRunner.commitTransaction();
 
       return { success: true };
     } catch (error) {
@@ -193,26 +207,32 @@ export class FundsService {
     });
   }
 
-  async deleteFunding(userId: number, presentId: number, fundId: number) {
+  async deleteFunding(
+    userId: number,
+    presentId: number,
+    fundId: number,
+  ): Promise<DeleteFundResponse> {
     await this.usersService.findUser('id', userId, null);
+
+    const fund = await this.findFund('id', fundId, ['Sender']);
+
+    // 자신의 펀딩이 아니면 불가능 하게 함
+    if (fund.Sender.id !== userId) {
+      throw new BadRequestException({
+        message: '자신의 펀딩만 취소할 수 있습니다.',
+        code: customErrorCode.FUNDING_NOT_MINE,
+      });
+    }
 
     const present = await this.presentsService.findPresent('id', presentId, [
       'User',
     ]);
 
-    if (present.complete === true) {
+    // 완료된 펀딩은 취소 불가능하게 함
+    if (present.complete) {
       throw new BadRequestException({
         message: '완료된 펀딩에 대해서는 취소할 수 없습니다!',
         code: customErrorCode.FUNDING_ALREADY_COMPLETE,
-      });
-    }
-
-    const fund = await this.findFund('id', 'fundId', ['Sender']);
-
-    if (fund.Sender.id !== userId) {
-      throw new BadRequestException({
-        message: '내가 한 펀딩만 취소할 수 있습니다.',
-        code: customErrorCode.FUNDING_NOT_MINE,
       });
     }
 
@@ -222,22 +242,21 @@ export class FundsService {
 
     try {
       // funding 삭제
-      await this.fundingRepository.delete({ id: fundId });
+      await this.deleteFund(fundId, queryRunner);
 
-      // present에서 money 차감
-      const total_money = present.money - fund.cost;
-      let total_complete = present.complete;
-
-      if (total_money < present.goal) {
-        total_complete = false;
-      }
-
-      present.money = total_money;
-      present.complete = total_complete;
+      // present에서 money 차감우
+      await this.presentsService.updatePresentMoney(
+        present,
+        fund.cost,
+        'minus',
+        queryRunner,
+      );
 
       await queryRunner.manager.getRepository(PresentEntity).save(present);
 
       await queryRunner.commitTransaction();
+
+      return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
     } finally {
