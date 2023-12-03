@@ -11,6 +11,7 @@ import {
   CreateUserDAO,
   UpdateUserDAO,
   UpdateMyInfoResponse,
+  Follower,
 } from '../../type/type';
 import { UpdateMyInfoRequestDto } from './dto/updateMyInfo.request.dto';
 import { FollowEntity } from '../../entities/follow.entity';
@@ -170,7 +171,10 @@ export class UsersService {
    * 닉네임으로 유저 검색
    * @param nickname
    */
-  async getUsersByNickname(nickname: string): Promise<User[]> {
+  async getUsersByNickname(
+    userId: number,
+    nickname: string,
+  ): Promise<Follower[]> {
     const users = await this.userRepository.find({
       where: {
         nickname: ILike(`%${nickname}%`),
@@ -178,9 +182,20 @@ export class UsersService {
       },
     });
 
-    return users.map((user) => {
-      return ModelConverter.user(user);
+    const followersWithFlag: Follower[] = [];
+
+    users.map(async (user) => {
+      const isFollowing = await this.followRepository.exist({
+        where: { followingId: user.id, followerId: userId },
+      });
+
+      followersWithFlag.push({
+        ...ModelConverter.user(user),
+        isFollowing: isFollowing,
+      });
     });
+
+    return followersWithFlag;
   }
 
   /**
