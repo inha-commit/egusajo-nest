@@ -350,15 +350,15 @@ export class PresentsService {
 
     // 내가 펀딩에 참여했는지 확인 TRUE | FALSE | MINE 으로 바꾸고 가기
 
-    let isParticipate: 'TRUE' | 'FALSE' | 'MINE' = 'TRUE';
+    let participateStatus: 'TRUE' | 'FALSE' | 'MINE' = 'TRUE';
 
     if (present.User.id == userId) {
-      isParticipate = 'MINE';
+      participateStatus = 'MINE';
     }
 
     const fundings = present.Funding.map((funding) => {
       if (funding.Sender.id == userId) {
-        isParticipate = 'FALSE';
+        participateStatus = 'FALSE';
       }
 
       return {
@@ -372,7 +372,7 @@ export class PresentsService {
       present: ModelConverter.present(present),
       presentImages: presentImages,
       fundings: fundings,
-      isParticipate: isParticipate,
+      participateStatus: participateStatus,
     };
   }
 

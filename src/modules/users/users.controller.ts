@@ -122,7 +122,10 @@ export class UsersController {
   })
   @Get('nickname/:nickname')
   @UseGuards(AccessTokenGuard)
-  async getUsersByNickname(@Param('nickname') nickname: string) {
+  async getUsersByNickname(
+    @Req() request,
+    @Param('nickname') nickname: string,
+  ) {
     if (!nickname || typeof nickname !== 'string') {
       throw new BadRequestException({
         message: 'nickname은 string type이어야 합니다!',
@@ -130,7 +133,10 @@ export class UsersController {
       });
     }
 
-    const response = await this.usersService.getUsersByNickname(nickname);
+    const response = await this.usersService.getUsersByNickname(
+      request.userId,
+      nickname,
+    );
 
     return new GetUsersByNicknameResponseDto(response);
   }

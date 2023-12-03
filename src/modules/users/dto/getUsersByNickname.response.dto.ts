@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class User {
+class GetUserByNicknameResponseDto {
   @ApiProperty({
     name: 'id',
     description: '사용자 id',
@@ -31,20 +31,27 @@ class User {
   })
   public profileImgSrc: string;
 
-  constructor(obj: User) {
+  @ApiProperty({
+    name: 'isFollowing',
+    description: '내가 팔로우 하고 있는지 여부',
+  })
+  public isFollowing: boolean;
+
+  constructor(obj: GetUserByNicknameResponseDto) {
     this.id = obj.id;
     this.name = obj.name;
     this.nickname = obj.nickname;
     this.birthday = obj.birthday;
     this.profileImgSrc = obj.profileImgSrc;
+    this.isFollowing = obj.isFollowing;
   }
 }
 
 export class GetUsersByNicknameResponseDto {
-  @ApiProperty({ type: [User] })
-  public users: User[];
+  @ApiProperty({ type: [GetUserByNicknameResponseDto] })
+  public users: GetUserByNicknameResponseDto[];
 
-  constructor(obj: User[]) {
-    this.users = obj.map((user) => new User(user));
+  constructor(obj: GetUserByNicknameResponseDto[]) {
+    this.users = obj.map((user) => new GetUserByNicknameResponseDto(user));
   }
 }

@@ -67,7 +67,6 @@ type Follower = {
   nickname: string;
   birthday: string;
   profileImgSrc: string;
-  alarm: boolean;
   isFollowing: boolean;
 };
 
@@ -126,7 +125,7 @@ type PresentWithFund = {
   present: Present;
   presentImages: string[];
   fundings: FundWithUser[];
-  isParticipate: 'TRUE' | 'FALSE' | 'MINE';
+  participateStatus: 'TRUE' | 'FALSE' | 'MINE';
 };
 
 type CreatePresentResponse = {
