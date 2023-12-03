@@ -256,10 +256,9 @@ export class PresentsService {
     }
 
     const present = await this.presentRepository.findOne({
-      where: { id: userId, deletedAt: null },
+      where: { UserId: userId, deletedAt: null },
     });
 
-    // 한해에 하나의 게시물만 작성 가능하게 막기
     if (present?.createdAt.getFullYear() === new Date().getFullYear()) {
       throw new BadRequestException({
         message: '한해에 한개의 게시물만 작성할 수 있습니다!',
