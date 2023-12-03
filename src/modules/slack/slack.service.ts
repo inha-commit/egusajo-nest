@@ -21,13 +21,13 @@ export class SlackService {
     }
   }
 
-  async newUser() {
+  async newUser(nickname: string) {
     await this.sendMessage(process.env.SLACK_NEW_USER_CHANNEL_ID, [
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: ':tada: *새로운 사용자가 가입했습니다!* :tada:',
+          text: `:tada: *${nickname}님이 새롭게 가입했습니다!* :tada:`,
         },
       },
     ]);

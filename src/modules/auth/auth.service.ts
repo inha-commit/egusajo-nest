@@ -71,7 +71,7 @@ export class AuthService {
 
     await this.redisService.saveRedisFcmToken(user.id, fcmId);
 
-    await this.slackSevice.newUser();
+    await this.slackSevice.newUser(user.nickname);
 
     const accessToken = this.createAccessToken(user.id);
     const refreshToken = this.createRefreshToken(user.id);
